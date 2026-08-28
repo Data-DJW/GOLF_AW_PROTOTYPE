@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Golf Betting Calculator</title>
+<style>
+  :root {
+    --green-dark: #0b3d24;
+    --green: #14532d;
+    --green-light: #1e7a44;
+    --cream: #f7f4ec;
+    --gold: #d4af37;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+    background:
+      radial-gradient(circle at 50% 15%, var(--green-light), var(--green) 45%, var(--green-dark) 100%);
+    color: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* subtle fairway stripes */
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      100deg,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 40px,
+      transparent 40px,
+      transparent 80px
+    );
+    pointer-events: none;
+  }
+
+  .stage {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .ball-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.25rem;
+  }
+
+  .golf-ball {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f1f1 45%, #d9d9d9 100%);
+    box-shadow:
+      inset -8px -8px 16px rgba(0,0,0,0.18),
+      inset 4px 4px 10px rgba(255,255,255,0.9),
+      0 18px 30px rgba(0,0,0,0.35);
+    position: relative;
+    animation: float 3.2s ease-in-out infinite;
+  }
+
+  .golf-ball::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-image:
+      radial-gradient(circle, rgba(0,0,0,0.12) 1.4px, transparent 1.6px);
+    background-size: 11px 11px;
+    background-position: 0 0;
+    mask-image: radial-gradient(circle at 40% 35%, black 55%, transparent 78%);
+    -webkit-mask-image: radial-gradient(circle at 40% 35%, black 55%, transparent 78%);
+  }
+
+  .golf-ball::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    bottom: -14px;
+    width: 72px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.35);
+    filter: blur(4px);
+    animation: shadow 3.2s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-16px); }
+  }
+  @keyframes shadow {
+    0%, 100% { transform: scale(1); opacity: 0.35; }
+    50% { transform: scale(0.72); opacity: 0.18; }
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+
+  h1 .accent {
+    color: var(--gold);
+  }
+
+  .subtitle {
+    margin-top: 0.9rem;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: rgba(247, 244, 236, 0.75);
+    letter-spacing: 0.01em;
+  }
+
+  .badge {
+    display: inline-block;
+    margin-top: 1.75rem;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green-dark);
+    background: var(--gold);
+    border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="ball-wrap">
+      <div class="golf-ball" aria-hidden="true"></div>
+    </div>
+    <h1>Golf Betting <span class="accent">Calculator</span></h1>
+    <p class="subtitle">골프 내기 정산, 이제 계산기 하나로 끝내세요</p>
+    <span class="badge">Coming Soon</span>
+  </div>
+</body>
+</html>
