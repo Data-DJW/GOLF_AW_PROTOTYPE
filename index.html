@@ -310,6 +310,137 @@
     box-shadow: 0 14px 28px rgba(212, 175, 55, 0.5);
   }
 
+  /* --- mode selection screen --- */
+  #screen-mode h2 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+  #screen-mode .subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mode-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    text-align: left;
+    max-height: 52vh;
+    overflow-y: auto;
+    padding: 0.2rem 0.3rem 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mode-card {
+    border: 2px solid rgba(247, 244, 236, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.9rem 1rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .mode-card.selected {
+    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.12);
+  }
+
+  .mode-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    cursor: pointer;
+  }
+  .mode-radio {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    position: relative;
+  }
+  .mode-card.selected .mode-radio::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .mode-head-text { flex: 1; }
+  .mode-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--cream);
+  }
+  .mode-tagline {
+    margin-top: 0.15rem;
+    font-size: 0.8rem;
+    color: rgba(247, 244, 236, 0.65);
+  }
+
+  .mode-details { margin-top: 0.7rem; }
+  .mode-details summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .mode-details summary::-webkit-details-marker { display: none; }
+  .mode-details summary::before {
+    content: "▸";
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+  .mode-details[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  .detail-block { margin-top: 0.6rem; }
+  .detail-block h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+  .detail-block p,
+  .detail-block li {
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: rgba(247, 244, 236, 0.82);
+  }
+  .detail-block p + p { margin-top: 0.4rem; }
+  .detail-block ul { padding-left: 1.1rem; }
+  .detail-block + .detail-block { margin-top: 0.75rem; }
+
+  .compare-wrap {
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border-radius: 10px;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .compare-table th,
+  .compare-table td {
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(247, 244, 236, 0.12);
+    color: rgba(247, 244, 236, 0.85);
+    white-space: nowrap;
+  }
+  .compare-table th {
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -347,6 +478,133 @@
     </div>
   </div>
 
+  <div class="stage" id="screen-mode" hidden>
+    <h2>내기 방식 선택</h2>
+    <p class="subtitle">오늘 라운드에서 어떤 방식으로 정산할지 골라보세요</p>
+
+    <div class="mode-list" id="modeList">
+      <div class="mode-card" data-mode="stroke">
+        <div class="mode-head">
+          <span class="mode-radio" aria-hidden="true"></span>
+          <div class="mode-head-text">
+            <div class="mode-title">스트로크 (타수) 내기</div>
+            <div class="mode-tagline">18홀 타수를 그대로 합산해서 정산</div>
+          </div>
+        </div>
+        <details class="mode-details">
+          <summary>자세히 보기</summary>
+          <div class="detail-block">
+            <h4>기본 원리</h4>
+            <p>18홀 동안 각자 친 타수를 그대로 합산해서, 라운드가 끝난 후 타수 차이만큼 정산하는 방식입니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>정산 예시</h4>
+            <ul>
+              <li>A: 85타, B: 90타, C: 88타, D: 92타</li>
+              <li>타당 금액을 1,000원으로 정했다면</li>
+              <li>A는 B에게 5,000원, C에게 3,000원, D에게 7,000원 받음</li>
+              <li>자기보다 타수가 많은 사람에게는 받고, 적은 사람에게는 줌</li>
+            </ul>
+          </div>
+          <div class="detail-block">
+            <h4>핸디캡 적용</h4>
+            <p>실력 차이가 있는 사람들끼리 칠 때는 핸디캡을 부여해서 공정하게 조정합니다. 예를 들어 상급자는 핸디 0, 초보자는 핸디 18을 주면 초보자는 실제 타수에서 18타를 빼고 계산합니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>장단점</h4>
+            <p><strong>장점</strong> — 계산이 단순하고 직관적입니다.</p>
+            <p><strong>단점</strong> — 한 홀에서 크게 무너지면(트리플보기 이상) 그 타격이 라운드 전체에 계속 영향을 줍니다. 초반에 스코어 차이가 벌어지면 후반 홀들은 긴장감이 떨어질 수 있습니다.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="mode-card" data-mode="skins">
+        <div class="mode-head">
+          <span class="mode-radio" aria-hidden="true"></span>
+          <div class="mode-head-text">
+            <div class="mode-title">스킨스 게임</div>
+            <div class="mode-tagline">홀마다 최저타 1명이 독식, 동타면 다음 홀로 이월</div>
+          </div>
+        </div>
+        <details class="mode-details">
+          <summary>자세히 보기</summary>
+          <div class="detail-block">
+            <h4>기본 원리</h4>
+            <p>18개 홀 하나하나가 독립된 승부입니다. 그 홀에서 가장 낮은 타수를 친 사람이 그 홀의 상금(스킨)을 독식합니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>핵심 규칙 — 캐리오버(이월)</h4>
+            <p>한 홀에서 두 명 이상이 동타로 최저타를 기록하면, 그 홀은 승자가 없는 것으로 처리되고 상금이 다음 홀로 넘어갑니다. 다음 홀에서도 동타가 나오면 또 넘어가고, 이런 식으로 계속 쌓일 수 있습니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>정산 예시</h4>
+            <ul>
+              <li>홀당 스킨 금액 5,000원으로 설정</li>
+              <li>1번홀: A 단독 최저타 → A가 5,000원 획득</li>
+              <li>2번홀: B, C 동타 → 캐리오버, 상금 이월 (누적 5,000원)</li>
+              <li>3번홀: D 단독 최저타 → D가 이월분까지 합쳐 10,000원 획득</li>
+            </ul>
+          </div>
+          <div class="detail-block">
+            <h4>특징</h4>
+            <p>후반부로 갈수록 캐리오버가 쌓이면 한 홀에 걸린 판돈이 커져서 긴장감이 극대화됩니다. 마지막 18번 홀까지 캐리오버가 이어지면 그야말로 대박 홀이 됩니다. 초반에 스코어가 나빠도 한 홀만 잘 치면 크게 만회할 수 있어서 끝까지 몰입도가 높습니다.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="mode-card" data-mode="draw">
+        <div class="mode-head">
+          <span class="mode-radio" aria-hidden="true"></span>
+          <div class="mode-head-text">
+            <div class="mode-title">뽑기 (팀 제비뽑기)</div>
+            <div class="mode-tagline">매 홀·구간마다 제비뽑기로 팀을 새로 짜는 방식</div>
+          </div>
+        </div>
+        <details class="mode-details">
+          <summary>자세히 보기</summary>
+          <div class="detail-block">
+            <h4>기본 원리</h4>
+            <p>4명이 라운드를 돌 때, 홀마다 혹은 일정 구간마다 카드나 제비뽑기로 팀을 바꿔가며 승부를 겨루는 방식입니다. 실력이 아니라 '운'으로 파트너가 정해지는 게 핵심 재미 요소입니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>진행 방식 예시</h4>
+            <ul>
+              <li>트럼프 카드 4장(예: 스페이드 A, 하트 A, 스페이드 K, 하트 K)을 뒤집어서 각자 한 장씩 뽑음</li>
+              <li>같은 무늬(스페이드끼리, 하트끼리)를 뽑은 사람끼리 한 팀</li>
+              <li>홀마다, 혹은 3홀 단위로 다시 뽑아서 팀을 재구성</li>
+            </ul>
+          </div>
+          <div class="detail-block">
+            <h4>정산 방식</h4>
+            <p>보통 각 홀에서 팀 스코어(둘 중 낮은 타수, 혹은 합산)로 승부합니다. 이긴 팀이 진 팀에게서 정해진 금액을 받고, 라운드가 끝나고 각자 몇 번 이겼는지 합산해서 최종 정산합니다.</p>
+          </div>
+          <div class="detail-block">
+            <h4>특징</h4>
+            <p>실력 좋은 사람과 계속 한 팀이 될 수도, 계속 못 만날 수도 있어서 순전히 운의 요소가 큽니다. 매번 파트너가 바뀌니까 지루할 틈이 없고, 실력 차이가 커도 뽑기 운으로 승부가 뒤집힐 수 있어서 부담 없이 즐기기 좋습니다.</p>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr><th>방식</th><th>승부 단위</th><th>특징</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>스트로크</td><td>18홀 전체</td><td>단순, 누적형</td></tr>
+          <tr><td>스킨스</td><td>홀 단위</td><td>긴장감 최고, 역전 가능</td></tr>
+          <tr><td>뽑기</td><td>팀(홀/구간 단위)</td><td>운 요소 큼, 재미 위주</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="setup-actions">
+      <button id="modeBackBtn" class="btn-secondary" type="button">뒤로</button>
+      <button id="modeNextBtn" class="btn-primary" type="button">다음</button>
+    </div>
+  </div>
+
   <script>
   (function () {
     var startBtn = document.getElementById('startBtn');
@@ -359,11 +617,21 @@
     var nameList = document.getElementById('nameList');
     var backBtn = document.getElementById('backBtn');
     var nextBtn = document.getElementById('nextBtn');
+    var screenMode = document.getElementById('screen-mode');
+    var modeList = document.getElementById('modeList');
+    var modeBackBtn = document.getElementById('modeBackBtn');
+    var modeNextBtn = document.getElementById('modeNextBtn');
 
     var MIN_PLAYERS = 2;
     var MAX_PLAYERS = 8;
     var playerCount = 4;
     var names = [];
+    var selectedMode = null;
+    var MODE_LABELS = {
+      stroke: '스트로크 (타수) 내기',
+      skins: '스킨스 게임',
+      draw: '뽑기 (팀 제비뽑기)'
+    };
     var audioCtx = null;
 
     // Synthesize a golf swing "whoosh" + ball impact "click" using Web Audio API
@@ -436,6 +704,56 @@
       flySrc.connect(flyFilter).connect(flyGain).connect(ctx.destination);
       flySrc.start(flyStart);
       flySrc.stop(flyStart + flyDur);
+    }
+
+    // Synthesize a ball-drops-into-the-cup sound (rattle against the cup wall
+    // + a hollow plop) using Web Audio API — no external audio file needed.
+    function playHoleSound() {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var ctx = audioCtx;
+      var now = ctx.currentTime;
+
+      // 1) Rattle: ball bouncing against the cup wall, a few quick decaying clicks
+      var rattleTimes = [0, 0.07, 0.13, 0.18];
+      rattleTimes.forEach(function (t, idx) {
+        var start = now + t;
+        var dur = 0.035;
+        var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        var d = buf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) {
+          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+        }
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        var filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1200 - idx * 150;
+        filter.Q.value = 2;
+        var gain = ctx.createGain();
+        var vol = 0.35 * (1 - idx * 0.18);
+        gain.gain.setValueAtTime(vol, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+        src.connect(filter).connect(gain).connect(ctx.destination);
+        src.start(start);
+        src.stop(start + dur);
+      });
+
+      // 2) Final plop: low sine with a quick downward pitch drop (hollow cup thud)
+      var plopStart = now + 0.22;
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, plopStart);
+      osc.frequency.exponentialRampToValueAtTime(90, plopStart + 0.18);
+      var oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(0.0001, plopStart);
+      oscGain.gain.exponentialRampToValueAtTime(0.5, plopStart + 0.02);
+      oscGain.gain.exponentialRampToValueAtTime(0.0001, plopStart + 0.3);
+      osc.connect(oscGain).connect(ctx.destination);
+      osc.start(plopStart);
+      osc.stop(plopStart + 0.32);
     }
 
     function renderNameInputs() {
@@ -517,7 +835,47 @@
         alert('모든 참가자의 이름을 입력해주세요.');
         return;
       }
-      alert('참가자 (' + playerCount + '명): ' + current.join(', ') + '\n다음 단계는 준비 중입니다!');
+      try { playHoleSound(); } catch (e) { /* audio not available, continue silently */ }
+
+      screenSetup.classList.add('fade-out');
+      setTimeout(function () {
+        screenSetup.hidden = true;
+        screenSetup.classList.remove('fade-out');
+        screenMode.hidden = false;
+        requestAnimationFrame(function () {
+          screenMode.classList.add('fade-in');
+        });
+      }, 380);
+    });
+
+    modeList.addEventListener('click', function (e) {
+      var head = e.target.closest('.mode-head');
+      if (!head) return;
+      var card = head.closest('.mode-card');
+      if (!card) return;
+      var cards = modeList.querySelectorAll('.mode-card');
+      cards.forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      selectedMode = card.getAttribute('data-mode');
+    });
+
+    modeBackBtn.addEventListener('click', function () {
+      screenMode.classList.remove('fade-in');
+      screenMode.hidden = true;
+      screenSetup.hidden = false;
+    });
+
+    modeNextBtn.addEventListener('click', function () {
+      if (!selectedMode) {
+        alert('내기 방식을 선택해주세요.');
+        return;
+      }
+      var current = names.slice(0, playerCount);
+      alert(
+        '참가자 (' + playerCount + '명): ' + current.join(', ') +
+        '\n선택한 방식: ' + MODE_LABELS[selectedMode] +
+        '\n다음 단계는 준비 중입니다!'
+      );
     });
   })();
   </script>
