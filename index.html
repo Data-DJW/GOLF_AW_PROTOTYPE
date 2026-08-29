@@ -441,6 +441,220 @@
   }
   .compare-table tr:last-child td { border-bottom: none; }
 
+  /* --- draw (team lottery) screen --- */
+  #screen-draw h2,
+  #screen-score h2 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+  #screen-draw .subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 1.4rem;
+  }
+  .draw-card { width: 72px; }
+  .draw-card-name {
+    font-size: 0.75rem;
+    color: rgba(247, 244, 236, 0.75);
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .draw-card-face {
+    width: 64px;
+    height: 88px;
+    margin: 0 auto;
+    perspective: 600px;
+  }
+  .draw-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease;
+    transform-style: preserve-3d;
+  }
+  .draw-card-face.flipped .draw-card-inner {
+    transform: rotateY(180deg);
+  }
+  .draw-card-back,
+  .draw-card-front {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+  }
+  .draw-card-back {
+    background: linear-gradient(135deg, var(--green-light), var(--green-dark));
+    border: 2px solid var(--gold);
+    font-size: 1.4rem;
+  }
+  .draw-card-front {
+    background: var(--cream);
+    transform: rotateY(180deg);
+    font-size: 1.9rem;
+    font-weight: 800;
+  }
+
+  .draw-result { margin-bottom: 1.4rem; }
+  .draw-team {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 0.65rem 0.9rem;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  .draw-team-suit { font-size: 1.1rem; flex: 0 0 auto; }
+  .draw-team-label {
+    font-weight: 800;
+    color: var(--gold);
+    font-size: 0.85rem;
+    flex: 0 0 auto;
+  }
+  .draw-team-names {
+    font-size: 0.88rem;
+    color: rgba(247, 244, 236, 0.9);
+  }
+
+  /* --- score entry screen --- */
+  #screen-score .subtitle {
+    margin-top: 0.4rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .hole-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .hole-nav-btn {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .hole-nav-btn:hover { background: rgba(212, 175, 55, 0.15); }
+  .hole-chip-row {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    flex: 1;
+    padding: 0.3rem 0.15rem;
+  }
+  .hole-chip {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 2px solid rgba(247, 244, 236, 0.18);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--cream);
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+  .hole-chip.active {
+    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--gold);
+  }
+  .hole-chip.filled::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  .score-players {
+    text-align: left;
+    max-height: 46vh;
+    overflow-y: auto;
+    padding: 0.1rem 0.15rem 0.2rem;
+    margin-bottom: 1.4rem;
+  }
+  .score-player-row {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 0.7rem 0.8rem;
+    margin-bottom: 0.6rem;
+  }
+  .score-player-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+  }
+  .score-team-badge { font-size: 0.9rem; color: var(--gold); flex: 0 0 auto; }
+  .score-player-name {
+    flex: 1;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .score-player-value {
+    font-weight: 800;
+    color: var(--gold);
+    font-size: 0.95rem;
+    min-width: 2.2rem;
+    text-align: right;
+  }
+  .score-pill-row {
+    display: flex;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .score-pill {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(247, 244, 236, 0.25);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--cream);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .score-pill.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--green-dark);
+    font-weight: 800;
+  }
+
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -605,6 +819,39 @@
     </div>
   </div>
 
+  <div class="stage" id="screen-draw" hidden>
+    <h2>팀 뽑기</h2>
+    <p class="subtitle">카드를 뽑아서 오늘의 팀을 정해보세요</p>
+
+    <div class="card-grid" id="cardGrid"></div>
+    <div class="draw-result" id="drawResult" hidden></div>
+
+    <div class="setup-actions">
+      <button id="drawBackBtn" class="btn-secondary" type="button">뒤로</button>
+      <button id="drawStartBtn" class="btn-primary" type="button">뽑기 시작</button>
+      <button id="drawRedoBtn" class="btn-secondary" type="button" hidden>다시 뽑기</button>
+      <button id="drawNextBtn" class="btn-primary" type="button" hidden>다음</button>
+    </div>
+  </div>
+
+  <div class="stage" id="screen-score" hidden>
+    <h2>스코어 입력</h2>
+    <p class="subtitle" id="holeProgress">1 / 18홀</p>
+
+    <div class="hole-nav">
+      <button id="holePrevBtn" class="hole-nav-btn" type="button" aria-label="이전 홀">‹</button>
+      <div class="hole-chip-row" id="holeChipRow"></div>
+      <button id="holeNextChevron" class="hole-nav-btn" type="button" aria-label="다음 홀 보기">›</button>
+    </div>
+
+    <div class="score-players" id="scorePlayers"></div>
+
+    <div class="setup-actions">
+      <button id="scoreBackBtn" class="btn-secondary" type="button">뒤로</button>
+      <button id="scoreNextBtn" class="btn-primary" type="button">다음 홀</button>
+    </div>
+  </div>
+
   <script>
   (function () {
     var startBtn = document.getElementById('startBtn');
@@ -621,9 +868,25 @@
     var modeList = document.getElementById('modeList');
     var modeBackBtn = document.getElementById('modeBackBtn');
     var modeNextBtn = document.getElementById('modeNextBtn');
+    var screenDraw = document.getElementById('screen-draw');
+    var cardGrid = document.getElementById('cardGrid');
+    var drawResult = document.getElementById('drawResult');
+    var drawBackBtn = document.getElementById('drawBackBtn');
+    var drawStartBtn = document.getElementById('drawStartBtn');
+    var drawRedoBtn = document.getElementById('drawRedoBtn');
+    var drawNextBtn = document.getElementById('drawNextBtn');
+    var screenScore = document.getElementById('screen-score');
+    var holeProgress = document.getElementById('holeProgress');
+    var holeChipRow = document.getElementById('holeChipRow');
+    var holePrevBtn = document.getElementById('holePrevBtn');
+    var holeNextChevron = document.getElementById('holeNextChevron');
+    var scorePlayers = document.getElementById('scorePlayers');
+    var scoreBackBtn = document.getElementById('scoreBackBtn');
+    var scoreNextBtn = document.getElementById('scoreNextBtn');
 
     var MIN_PLAYERS = 2;
     var MAX_PLAYERS = 8;
+    var HOLE_COUNT = 18;
     var playerCount = 4;
     var names = [];
     var selectedMode = null;
@@ -632,7 +895,42 @@
       skins: '스킨스 게임',
       draw: '뽑기 (팀 제비뽑기)'
     };
+    var SUITS = ['♠', '♥', '♦', '♣'];
+    var teams = null;          // array of arrays of player indices
+    var playerSuit = {};       // playerIdx -> suit char
+    var scores = [];           // scores[holeIdx][playerIdx] = relative-to-par int | null
+    var currentHole = 0;
+    var SCORE_STEPS = [
+      { value: -3, label: '-3↓' },
+      { value: -2, label: '이글' },
+      { value: -1, label: '버디' },
+      { value: 0, label: '파' },
+      { value: 1, label: '보기' },
+      { value: 2, label: '더블' },
+      { value: 3, label: '트리플' },
+      { value: 4, label: '+4↑' }
+    ];
     var audioCtx = null;
+
+    function transitionTo(fromEl, toEl, cb) {
+      fromEl.classList.add('fade-out');
+      setTimeout(function () {
+        fromEl.hidden = true;
+        fromEl.classList.remove('fade-out');
+        toEl.hidden = false;
+        if (cb) cb();
+        requestAnimationFrame(function () {
+          toEl.classList.add('fade-in');
+        });
+      }, 380);
+    }
+
+    function goBack(fromEl, toEl) {
+      fromEl.classList.remove('fade-in');
+      fromEl.hidden = true;
+      toEl.hidden = false;
+      toEl.classList.remove('fade-out');
+    }
 
     // Synthesize a golf swing "whoosh" + ball impact "click" using Web Audio API
     // (no external audio file needed).
@@ -706,8 +1004,9 @@
       flySrc.stop(flyStart + flyDur);
     }
 
-    // Synthesize a ball-drops-into-the-cup sound (rattle against the cup wall
-    // + a hollow plop) using Web Audio API — no external audio file needed.
+    // Synthesize a bright, cheerful "딸그랑" chime (bell-like ping, two quick
+    // ascending notes) for the ball dropping into the cup — Web Audio API,
+    // no external audio file needed.
     function playHoleSound() {
       var Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
@@ -716,44 +1015,26 @@
       var ctx = audioCtx;
       var now = ctx.currentTime;
 
-      // 1) Rattle: ball bouncing against the cup wall, a few quick decaying clicks
-      var rattleTimes = [0, 0.07, 0.13, 0.18];
-      rattleTimes.forEach(function (t, idx) {
-        var start = now + t;
-        var dur = 0.035;
-        var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
-        var d = buf.getChannelData(0);
-        for (var i = 0; i < d.length; i++) {
-          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
-        }
-        var src = ctx.createBufferSource();
-        src.buffer = buf;
-        var filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 1200 - idx * 150;
-        filter.Q.value = 2;
-        var gain = ctx.createGain();
-        var vol = 0.35 * (1 - idx * 0.18);
-        gain.gain.setValueAtTime(vol, start);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
-        src.connect(filter).connect(gain).connect(ctx.destination);
-        src.start(start);
-        src.stop(start + dur);
-      });
+      function ping(time, freq, dur, peak) {
+        var partials = [1, 2.42, 3.9];
+        var partialGains = [1, 0.45, 0.22];
+        partials.forEach(function (mult, i) {
+          var osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = freq * mult;
+          var g = ctx.createGain();
+          var pk = peak * partialGains[i];
+          g.gain.setValueAtTime(0.0001, time);
+          g.gain.linearRampToValueAtTime(pk, time + 0.006);
+          g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+          osc.connect(g).connect(ctx.destination);
+          osc.start(time);
+          osc.stop(time + dur + 0.05);
+        });
+      }
 
-      // 2) Final plop: low sine with a quick downward pitch drop (hollow cup thud)
-      var plopStart = now + 0.22;
-      var osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(220, plopStart);
-      osc.frequency.exponentialRampToValueAtTime(90, plopStart + 0.18);
-      var oscGain = ctx.createGain();
-      oscGain.gain.setValueAtTime(0.0001, plopStart);
-      oscGain.gain.exponentialRampToValueAtTime(0.5, plopStart + 0.02);
-      oscGain.gain.exponentialRampToValueAtTime(0.0001, plopStart + 0.3);
-      osc.connect(oscGain).connect(ctx.destination);
-      osc.start(plopStart);
-      osc.stop(plopStart + 0.32);
+      ping(now, 1568, 0.3, 0.5);          // 딸  (bright, short)
+      ping(now + 0.1, 2093, 0.45, 0.42);  // 그랑 (higher, trailing shimmer)
     }
 
     function renderNameInputs() {
@@ -786,6 +1067,249 @@
       countDisplay.textContent = playerCount;
       decBtn.disabled = playerCount <= MIN_PLAYERS;
       incBtn.disabled = playerCount >= MAX_PLAYERS;
+    }
+
+    // ---- team draw (뽑기) ----
+
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+      }
+      return a;
+    }
+
+    function computeTeams() {
+      var idxs = [];
+      for (var i = 0; i < playerCount; i++) idxs.push(i);
+      var order = shuffle(idxs);
+
+      if (playerCount === 2) {
+        teams = [[order[0]], [order[1]]];
+      } else {
+        teams = [];
+        for (var k = 0; k < order.length; k += 2) {
+          teams.push(order.slice(k, k + 2));
+        }
+        if (teams.length > 1 && teams[teams.length - 1].length === 1) {
+          var leftover = teams.pop();
+          teams[teams.length - 1] = teams[teams.length - 1].concat(leftover);
+        }
+      }
+
+      playerSuit = {};
+      teams.forEach(function (team, ti) {
+        var suit = SUITS[ti % SUITS.length];
+        team.forEach(function (pIdx) { playerSuit[pIdx] = suit; });
+      });
+    }
+
+    function suitColor(suit) {
+      return (suit === '♥' || suit === '♦') ? '#e0554f' : '#f7f4ec';
+    }
+
+    function renderDrawCards() {
+      cardGrid.innerHTML = '';
+      drawResult.hidden = true;
+      drawResult.innerHTML = '';
+      drawStartBtn.hidden = false;
+      drawRedoBtn.hidden = true;
+      drawNextBtn.hidden = true;
+
+      for (var i = 0; i < playerCount; i++) {
+        var card = document.createElement('div');
+        card.className = 'draw-card';
+        card.setAttribute('data-player-idx', i);
+        card.innerHTML =
+          '<div class="draw-card-name">' + (names[i] || (i + 1) + '번') + '</div>' +
+          '<div class="draw-card-face">' +
+            '<div class="draw-card-inner">' +
+              '<div class="draw-card-back">⛳</div>' +
+              '<div class="draw-card-front"><span class="suit"></span></div>' +
+            '</div>' +
+          '</div>';
+        cardGrid.appendChild(card);
+      }
+    }
+
+    function renderDrawResult() {
+      var html = '';
+      teams.forEach(function (team, i) {
+        var suit = SUITS[i % SUITS.length];
+        var teamNames = team.map(function (pIdx) { return names[pIdx] || (pIdx + 1) + '번'; }).join(', ');
+        html +=
+          '<div class="draw-team">' +
+            '<span class="draw-team-suit" style="color:' + suitColor(suit) + '">' + suit + '</span>' +
+            '<span class="draw-team-label">' + (i + 1) + '팀</span>' +
+            '<span class="draw-team-names">' + teamNames + '</span>' +
+          '</div>';
+      });
+      drawResult.innerHTML = html;
+    }
+
+    function runDraw() {
+      computeTeams();
+      var cards = cardGrid.querySelectorAll('.draw-card');
+      cards.forEach(function (card) {
+        var idx = Number(card.getAttribute('data-player-idx'));
+        var face = card.querySelector('.draw-card-face');
+        var suitSpan = card.querySelector('.suit');
+        var suit = playerSuit[idx];
+        suitSpan.textContent = suit;
+        suitSpan.style.color = suitColor(suit);
+        face.classList.remove('flipped');
+      });
+      cards.forEach(function (card, i) {
+        var face = card.querySelector('.draw-card-face');
+        setTimeout(function () {
+          face.classList.add('flipped');
+        }, i * 120);
+      });
+      setTimeout(function () {
+        renderDrawResult();
+        drawResult.hidden = false;
+        drawStartBtn.hidden = true;
+        drawRedoBtn.hidden = false;
+        drawNextBtn.hidden = false;
+      }, cards.length * 120 + 550);
+    }
+
+    // ---- score entry (18 holes) ----
+
+    function formatScoreLabel(val) {
+      if (val === null || val === undefined) return '-';
+      if (val === 0) return 'E';
+      return (val > 0 ? '+' : '') + val;
+    }
+
+    function initScores() {
+      scores = [];
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        var row = [];
+        for (var p = 0; p < playerCount; p++) row.push(null);
+        scores.push(row);
+      }
+      currentHole = 0;
+    }
+
+    function buildHoleChips() {
+      holeChipRow.innerHTML = '';
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        (function (idx) {
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'hole-chip';
+          chip.textContent = idx + 1;
+          chip.addEventListener('click', function () {
+            currentHole = idx;
+            renderScoreHole();
+          });
+          holeChipRow.appendChild(chip);
+        })(h);
+      }
+    }
+
+    function isHoleFilled(h) {
+      for (var p = 0; p < playerCount; p++) {
+        if (scores[h][p] === null) return false;
+      }
+      return true;
+    }
+
+    function renderScoreHole() {
+      holeProgress.textContent = (currentHole + 1) + ' / ' + HOLE_COUNT + '홀';
+      scoreNextBtn.textContent = (currentHole === HOLE_COUNT - 1) ? '결과 보기' : '다음 홀';
+
+      var chips = holeChipRow.children;
+      for (var c = 0; c < chips.length; c++) {
+        chips[c].classList.toggle('active', c === currentHole);
+        chips[c].classList.toggle('filled', isHoleFilled(c));
+      }
+
+      var activeChip = chips[currentHole];
+      if (activeChip && activeChip.scrollIntoView) {
+        activeChip.scrollIntoView({ block: 'nearest', inline: 'center' });
+      }
+
+      scorePlayers.innerHTML = '';
+      for (var p = 0; p < playerCount; p++) {
+        (function (pIdx) {
+          var row = document.createElement('div');
+          row.className = 'score-player-row';
+
+          var head = document.createElement('div');
+          head.className = 'score-player-head';
+
+          if (selectedMode === 'draw' && playerSuit[pIdx]) {
+            var badge = document.createElement('span');
+            badge.className = 'score-team-badge';
+            badge.textContent = playerSuit[pIdx];
+            badge.style.color = suitColor(playerSuit[pIdx]);
+            head.appendChild(badge);
+          }
+
+          var nameSpan = document.createElement('span');
+          nameSpan.className = 'score-player-name';
+          nameSpan.textContent = names[pIdx] || (pIdx + 1) + '번';
+          head.appendChild(nameSpan);
+
+          var valueSpan = document.createElement('span');
+          valueSpan.className = 'score-player-value';
+          valueSpan.textContent = formatScoreLabel(scores[currentHole][pIdx]);
+          head.appendChild(valueSpan);
+
+          row.appendChild(head);
+
+          var pillRow = document.createElement('div');
+          pillRow.className = 'score-pill-row';
+          SCORE_STEPS.forEach(function (step) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'score-pill';
+            btn.textContent = step.label;
+            if (scores[currentHole][pIdx] === step.value) btn.classList.add('active');
+            btn.addEventListener('click', function () {
+              scores[currentHole][pIdx] = step.value;
+              renderScoreHole();
+            });
+            pillRow.appendChild(btn);
+          });
+          row.appendChild(pillRow);
+
+          scorePlayers.appendChild(row);
+        })(p);
+      }
+    }
+
+    function enterScoreScreen() {
+      initScores();
+      buildHoleChips();
+      renderScoreHole();
+    }
+
+    function finishScoring() {
+      var totals = [];
+      for (var p = 0; p < playerCount; p++) {
+        var sum = 0;
+        for (var h = 0; h < HOLE_COUNT; h++) {
+          if (scores[h][p] !== null) sum += scores[h][p];
+        }
+        totals.push({ name: names[p] || (p + 1) + '번', total: sum });
+      }
+      totals.sort(function (a, b) { return a.total - b.total; });
+
+      var filledHoles = 0;
+      for (var h2 = 0; h2 < HOLE_COUNT; h2++) if (isHoleFilled(h2)) filledHoles++;
+
+      var lines = totals.map(function (t, i) {
+        return (i + 1) + '위 ' + t.name + ': ' + formatScoreLabel(t.total);
+      });
+      alert(
+        '최종 스코어 (18홀 중 ' + filledHoles + '홀 입력)\n' +
+        lines.join('\n') +
+        '\n\n정산 화면은 준비 중입니다!'
+      );
     }
 
     decBtn.addEventListener('click', function () {
@@ -870,12 +1394,68 @@
         alert('내기 방식을 선택해주세요.');
         return;
       }
-      var current = names.slice(0, playerCount);
-      alert(
-        '참가자 (' + playerCount + '명): ' + current.join(', ') +
-        '\n선택한 방식: ' + MODE_LABELS[selectedMode] +
-        '\n다음 단계는 준비 중입니다!'
-      );
+      if (selectedMode === 'draw') {
+        renderDrawCards();
+        transitionTo(screenMode, screenDraw);
+      } else {
+        transitionTo(screenMode, screenScore, enterScoreScreen);
+      }
+    });
+
+    drawBackBtn.addEventListener('click', function () {
+      goBack(screenDraw, screenMode);
+    });
+
+    drawStartBtn.addEventListener('click', function () {
+      runDraw();
+    });
+
+    drawRedoBtn.addEventListener('click', function () {
+      renderDrawCards();
+      requestAnimationFrame(function () { runDraw(); });
+    });
+
+    drawNextBtn.addEventListener('click', function () {
+      transitionTo(screenDraw, screenScore, enterScoreScreen);
+    });
+
+    holePrevBtn.addEventListener('click', function () {
+      if (currentHole > 0) {
+        currentHole--;
+        renderScoreHole();
+      }
+    });
+    holeNextChevron.addEventListener('click', function () {
+      if (currentHole < HOLE_COUNT - 1) {
+        currentHole++;
+        renderScoreHole();
+      }
+    });
+
+    scoreBackBtn.addEventListener('click', function () {
+      if (currentHole > 0) {
+        currentHole--;
+        renderScoreHole();
+        return;
+      }
+      if (selectedMode === 'draw') {
+        goBack(screenScore, screenDraw);
+      } else {
+        goBack(screenScore, screenMode);
+      }
+    });
+
+    scoreNextBtn.addEventListener('click', function () {
+      if (!isHoleFilled(currentHole)) {
+        alert('모든 참가자의 스코어를 입력해주세요.');
+        return;
+      }
+      if (currentHole < HOLE_COUNT - 1) {
+        currentHole++;
+        renderScoreHole();
+      } else {
+        finishScoring();
+      }
     });
   })();
   </script>
