@@ -48,6 +48,22 @@
     z-index: 1;
     text-align: center;
     padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .stage.fade-out {
+    animation: fadeOut 0.4s ease forwards;
+  }
+  .stage.fade-in {
+    animation: fadeIn 0.4s ease forwards;
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-12px); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .ball-wrap {
@@ -105,6 +121,16 @@
     50% { transform: scale(0.72); opacity: 0.18; }
   }
 
+  /* ball gets struck and flies off screen */
+  .golf-ball.hit {
+    animation: hitFly 0.75s cubic-bezier(.32,.63,.4,1) forwards;
+  }
+  @keyframes hitFly {
+    0% { transform: translate(0,0) scale(1) rotate(0deg); }
+    12% { transform: translate(-6px, 4px) scale(0.94, 1.06) rotate(-8deg); }
+    100% { transform: translate(760px, -560px) scale(0.1) rotate(640deg); opacity: 0; }
+  }
+
   h1 {
     font-size: clamp(2rem, 5vw, 3.4rem);
     font-weight: 800;
@@ -137,16 +163,363 @@
     border-radius: 999px;
     box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
   }
+
+  .start-btn {
+    display: inline-block;
+    margin-top: 2.25rem;
+    padding: 0.85rem 2.6rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--green-dark);
+    background: var(--gold);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .start-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(212, 175, 55, 0.5);
+  }
+  .start-btn:active {
+    transform: translateY(0);
+  }
+  .start-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+  }
+
+  /* --- setup screen --- */
+  #screen-setup h2 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+  #screen-setup .subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .count-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.4rem;
+    margin-bottom: 1.75rem;
+  }
+  .count-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: transparent;
+    color: var(--gold);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .count-btn:hover { background: rgba(212, 175, 55, 0.15); }
+  .count-btn:active { transform: scale(0.94); }
+  .count-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .count-display {
+    min-width: 3.2rem;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .count-label {
+    font-size: 0.95rem;
+    color: rgba(247, 244, 236, 0.7);
+  }
+
+  .name-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    padding: 0.2rem 0.2rem 0.4rem;
+    margin-bottom: 1.75rem;
+  }
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .name-index {
+    flex: 0 0 2.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-align: right;
+  }
+  .name-input {
+    flex: 1;
+    padding: 0.65rem 0.9rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--green-dark);
+    background: var(--cream);
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    box-shadow: inset 0 0 0 2px transparent;
+    transition: box-shadow 0.15s ease;
+  }
+  .name-input:focus {
+    box-shadow: inset 0 0 0 2px var(--gold);
+  }
+
+  .setup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+  .btn-secondary,
+  .btn-primary {
+    padding: 0.75rem 1.8rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-secondary {
+    color: var(--cream);
+    background: rgba(247, 244, 236, 0.12);
+    border: 1px solid rgba(247, 244, 236, 0.35);
+  }
+  .btn-secondary:hover { background: rgba(247, 244, 236, 0.2); }
+  .btn-primary {
+    color: var(--green-dark);
+    background: var(--gold);
+    box-shadow: 0 10px 24px rgba(212, 175, 55, 0.4);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(212, 175, 55, 0.5);
+  }
+
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
-  <div class="stage">
+  <div class="stage" id="screen-start">
     <div class="ball-wrap">
-      <div class="golf-ball" aria-hidden="true"></div>
+      <div class="golf-ball" id="golfBall" aria-hidden="true"></div>
     </div>
     <h1>Golf Betting <span class="accent">Calculator</span></h1>
     <p class="subtitle">골프 내기 정산, 이제 계산기 하나로 끝내세요</p>
     <span class="badge">Coming Soon</span>
+    <div>
+      <button id="startBtn" class="start-btn" type="button">시작하기</button>
+    </div>
   </div>
+
+  <div class="stage" id="screen-setup" hidden>
+    <h2>참가자 설정</h2>
+    <p class="subtitle">인원수를 정하고 이름을 입력하세요</p>
+
+    <div class="count-control">
+      <button id="decBtn" class="count-btn" type="button" aria-label="인원 감소">−</button>
+      <div>
+        <div class="count-display" id="countDisplay">4</div>
+        <div class="count-label">명</div>
+      </div>
+      <button id="incBtn" class="count-btn" type="button" aria-label="인원 증가">+</button>
+    </div>
+
+    <div class="name-list" id="nameList"></div>
+
+    <div class="setup-actions">
+      <button id="backBtn" class="btn-secondary" type="button">뒤로</button>
+      <button id="nextBtn" class="btn-primary" type="button">다음</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var startBtn = document.getElementById('startBtn');
+    var ball = document.getElementById('golfBall');
+    var screenStart = document.getElementById('screen-start');
+    var screenSetup = document.getElementById('screen-setup');
+    var countDisplay = document.getElementById('countDisplay');
+    var decBtn = document.getElementById('decBtn');
+    var incBtn = document.getElementById('incBtn');
+    var nameList = document.getElementById('nameList');
+    var backBtn = document.getElementById('backBtn');
+    var nextBtn = document.getElementById('nextBtn');
+
+    var MIN_PLAYERS = 2;
+    var MAX_PLAYERS = 8;
+    var playerCount = 4;
+    var names = [];
+    var audioCtx = null;
+
+    // Synthesize a golf swing "whoosh" + ball impact "click" using Web Audio API
+    // (no external audio file needed).
+    function playSwingSound() {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var ctx = audioCtx;
+      var now = ctx.currentTime;
+
+      // 1) Club swing whoosh: filtered noise sweeping down in pitch
+      var whooshDur = 0.32;
+      var whooshBuffer = ctx.createBuffer(1, ctx.sampleRate * whooshDur, ctx.sampleRate);
+      var wd = whooshBuffer.getChannelData(0);
+      for (var i = 0; i < wd.length; i++) wd[i] = Math.random() * 2 - 1;
+      var whooshSrc = ctx.createBufferSource();
+      whooshSrc.buffer = whooshBuffer;
+      var whooshFilter = ctx.createBiquadFilter();
+      whooshFilter.type = 'bandpass';
+      whooshFilter.Q.value = 0.9;
+      whooshFilter.frequency.setValueAtTime(2200, now);
+      whooshFilter.frequency.exponentialRampToValueAtTime(500, now + whooshDur);
+      var whooshGain = ctx.createGain();
+      whooshGain.gain.setValueAtTime(0.0001, now);
+      whooshGain.gain.exponentialRampToValueAtTime(0.5, now + whooshDur * 0.55);
+      whooshGain.gain.exponentialRampToValueAtTime(0.0001, now + whooshDur);
+      whooshSrc.connect(whooshFilter).connect(whooshGain).connect(ctx.destination);
+      whooshSrc.start(now);
+      whooshSrc.stop(now + whooshDur);
+
+      // 2) Ball impact click at moment of contact
+      var hitTime = now + whooshDur * 0.62;
+      var clickBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.045, ctx.sampleRate);
+      var cd = clickBuffer.getChannelData(0);
+      for (var j = 0; j < cd.length; j++) {
+        cd[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / cd.length, 2.2);
+      }
+      var clickSrc = ctx.createBufferSource();
+      clickSrc.buffer = clickBuffer;
+      var clickFilter = ctx.createBiquadFilter();
+      clickFilter.type = 'bandpass';
+      clickFilter.frequency.value = 2800;
+      clickFilter.Q.value = 1.4;
+      var clickGain = ctx.createGain();
+      clickGain.gain.setValueAtTime(0.9, hitTime);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, hitTime + 0.08);
+      clickSrc.connect(clickFilter).connect(clickGain).connect(ctx.destination);
+      clickSrc.start(hitTime);
+      clickSrc.stop(hitTime + 0.08);
+
+      // 3) Ball flying away: rising-then-fading high whoosh
+      var flyStart = hitTime;
+      var flyDur = 0.5;
+      var flyBuffer = ctx.createBuffer(1, ctx.sampleRate * flyDur, ctx.sampleRate);
+      var fd = flyBuffer.getChannelData(0);
+      for (var k = 0; k < fd.length; k++) fd[k] = Math.random() * 2 - 1;
+      var flySrc = ctx.createBufferSource();
+      flySrc.buffer = flyBuffer;
+      var flyFilter = ctx.createBiquadFilter();
+      flyFilter.type = 'bandpass';
+      flyFilter.Q.value = 1.1;
+      flyFilter.frequency.setValueAtTime(3600, flyStart);
+      flyFilter.frequency.exponentialRampToValueAtTime(900, flyStart + flyDur);
+      var flyGain = ctx.createGain();
+      flyGain.gain.setValueAtTime(0.0001, flyStart);
+      flyGain.gain.exponentialRampToValueAtTime(0.35, flyStart + 0.06);
+      flyGain.gain.exponentialRampToValueAtTime(0.0001, flyStart + flyDur);
+      flySrc.connect(flyFilter).connect(flyGain).connect(ctx.destination);
+      flySrc.start(flyStart);
+      flySrc.stop(flyStart + flyDur);
+    }
+
+    function renderNameInputs() {
+      names = names.slice(0, playerCount);
+      nameList.innerHTML = '';
+      for (var i = 0; i < playerCount; i++) {
+        (function (idx) {
+          var row = document.createElement('div');
+          row.className = 'name-row';
+
+          var label = document.createElement('span');
+          label.className = 'name-index';
+          label.textContent = (idx + 1) + '번';
+
+          var input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'name-input';
+          input.placeholder = '이름 입력';
+          input.maxLength = 8;
+          input.value = names[idx] || '';
+          input.addEventListener('input', function (e) {
+            names[idx] = e.target.value;
+          });
+
+          row.appendChild(label);
+          row.appendChild(input);
+          nameList.appendChild(row);
+        })(i);
+      }
+      countDisplay.textContent = playerCount;
+      decBtn.disabled = playerCount <= MIN_PLAYERS;
+      incBtn.disabled = playerCount >= MAX_PLAYERS;
+    }
+
+    decBtn.addEventListener('click', function () {
+      if (playerCount > MIN_PLAYERS) {
+        playerCount--;
+        renderNameInputs();
+      }
+    });
+    incBtn.addEventListener('click', function () {
+      if (playerCount < MAX_PLAYERS) {
+        playerCount++;
+        renderNameInputs();
+      }
+    });
+
+    startBtn.addEventListener('click', function () {
+      startBtn.disabled = true;
+      try { playSwingSound(); } catch (e) { /* audio not available, continue silently */ }
+      ball.classList.add('hit');
+
+      setTimeout(function () {
+        screenStart.classList.add('fade-out');
+        setTimeout(function () {
+          screenStart.hidden = true;
+          screenSetup.hidden = false;
+          renderNameInputs();
+          requestAnimationFrame(function () {
+            screenSetup.classList.add('fade-in');
+          });
+        }, 380);
+      }, 550);
+    });
+
+    backBtn.addEventListener('click', function () {
+      screenSetup.classList.remove('fade-in');
+      screenSetup.hidden = true;
+      screenStart.hidden = false;
+      screenStart.classList.remove('fade-out');
+      ball.classList.remove('hit');
+      startBtn.disabled = false;
+    });
+
+    nextBtn.addEventListener('click', function () {
+      var current = names.slice(0, playerCount);
+      var missing = current.some(function (n) { return !n || !n.trim(); });
+      if (missing) {
+        alert('모든 참가자의 이름을 입력해주세요.');
+        return;
+      }
+      alert('참가자 (' + playerCount + '명): ' + current.join(', ') + '\n다음 단계는 준비 중입니다!');
+    });
+  })();
+  </script>
 </body>
 </html>
