@@ -655,6 +655,134 @@
     font-weight: 800;
   }
 
+  /* --- bet amount screen --- */
+  #screen-bet h2 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+  #screen-bet .subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .bet-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.3rem;
+  }
+  .bet-chip {
+    padding: 0.55rem 1.05rem;
+    border-radius: 999px;
+    border: 2px solid rgba(247, 244, 236, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--cream);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  .bet-chip.active {
+    border-color: var(--gold);
+    background: rgba(212, 175, 55, 0.18);
+    color: var(--gold);
+  }
+
+  .bet-custom-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.1rem;
+  }
+  .bet-custom-input {
+    width: 150px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--green-dark);
+    background: var(--cream);
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    text-align: right;
+  }
+  .bet-custom-unit {
+    color: rgba(247, 244, 236, 0.75);
+    font-size: 0.9rem;
+  }
+
+  .bet-current {
+    margin-bottom: 1.8rem;
+    font-size: 0.95rem;
+    color: rgba(247, 244, 236, 0.85);
+  }
+  .bet-current strong { color: var(--gold); }
+
+  /* --- result (정산) screen --- */
+  #screen-result h2 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 800;
+    color: var(--cream);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+  }
+  #screen-result .subtitle {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-list {
+    text-align: left;
+    max-height: 42vh;
+    overflow-y: auto;
+    padding: 0.1rem 0.15rem 0.2rem;
+    margin-bottom: 1rem;
+  }
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  .result-rank {
+    flex: 0 0 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--gold);
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .result-name {
+    flex: 1;
+    font-weight: 700;
+    font-size: 0.92rem;
+  }
+  .result-score {
+    font-size: 0.78rem;
+    color: rgba(247, 244, 236, 0.55);
+    margin-right: 0.2rem;
+  }
+  .result-net {
+    font-weight: 800;
+    font-size: 0.92rem;
+    min-width: 5.6rem;
+    text-align: right;
+  }
+  .result-net.positive { color: var(--gold); }
+  .result-net.negative { color: #e0554f; }
+  .result-net.even { color: rgba(247, 244, 236, 0.55); }
+
+  #resultDetails { margin-bottom: 1.5rem; text-align: left; }
+
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -819,6 +947,23 @@
     </div>
   </div>
 
+  <div class="stage" id="screen-bet" hidden>
+    <h2>베팅 금액</h2>
+    <p class="subtitle" id="betLabel">금액을 정하세요</p>
+
+    <div class="bet-chip-row" id="betChipRow"></div>
+    <div class="bet-custom-row">
+      <input id="betCustomInput" type="number" inputmode="numeric" min="0" step="100" class="bet-custom-input" placeholder="직접 입력">
+      <span class="bet-custom-unit">원</span>
+    </div>
+    <p class="bet-current">선택한 금액: <strong id="betCurrentDisplay">1,000원</strong></p>
+
+    <div class="setup-actions">
+      <button id="betBackBtn" class="btn-secondary" type="button">뒤로</button>
+      <button id="betNextBtn" class="btn-primary" type="button">다음</button>
+    </div>
+  </div>
+
   <div class="stage" id="screen-draw" hidden>
     <h2>팀 뽑기</h2>
     <p class="subtitle">카드를 뽑아서 오늘의 팀을 정해보세요</p>
@@ -852,6 +997,23 @@
     </div>
   </div>
 
+  <div class="stage" id="screen-result" hidden>
+    <h2>정산 결과</h2>
+    <p class="subtitle" id="resultSubtitle"></p>
+
+    <div class="result-list" id="resultList"></div>
+
+    <details class="mode-details" id="resultDetails">
+      <summary>정산 내역 보기</summary>
+      <div class="detail-block" id="resultDetailBody"></div>
+    </details>
+
+    <div class="setup-actions">
+      <button id="resultBackBtn" class="btn-secondary" type="button">스코어 수정</button>
+      <button id="resultRestartBtn" class="btn-primary" type="button">처음으로</button>
+    </div>
+  </div>
+
   <script>
   (function () {
     var startBtn = document.getElementById('startBtn');
@@ -868,6 +1030,13 @@
     var modeList = document.getElementById('modeList');
     var modeBackBtn = document.getElementById('modeBackBtn');
     var modeNextBtn = document.getElementById('modeNextBtn');
+    var screenBet = document.getElementById('screen-bet');
+    var betLabel = document.getElementById('betLabel');
+    var betChipRow = document.getElementById('betChipRow');
+    var betCustomInput = document.getElementById('betCustomInput');
+    var betCurrentDisplay = document.getElementById('betCurrentDisplay');
+    var betBackBtn = document.getElementById('betBackBtn');
+    var betNextBtn = document.getElementById('betNextBtn');
     var screenDraw = document.getElementById('screen-draw');
     var cardGrid = document.getElementById('cardGrid');
     var drawResult = document.getElementById('drawResult');
@@ -883,6 +1052,13 @@
     var scorePlayers = document.getElementById('scorePlayers');
     var scoreBackBtn = document.getElementById('scoreBackBtn');
     var scoreNextBtn = document.getElementById('scoreNextBtn');
+    var screenResult = document.getElementById('screen-result');
+    var resultSubtitle = document.getElementById('resultSubtitle');
+    var resultList = document.getElementById('resultList');
+    var resultDetails = document.getElementById('resultDetails');
+    var resultDetailBody = document.getElementById('resultDetailBody');
+    var resultBackBtn = document.getElementById('resultBackBtn');
+    var resultRestartBtn = document.getElementById('resultRestartBtn');
 
     var MIN_PLAYERS = 2;
     var MAX_PLAYERS = 8;
@@ -910,7 +1086,27 @@
       { value: 3, label: '트리플' },
       { value: 4, label: '+4↑' }
     ];
+    var BET_PRESETS = {
+      stroke: [500, 1000, 2000, 3000, 5000],
+      skins: [3000, 5000, 10000, 20000, 30000],
+      draw: [3000, 5000, 10000, 20000, 30000]
+    };
+    var BET_LABELS = {
+      stroke: '1타당 금액을 정하세요',
+      skins: '홀마다 걸 스킨 금액을 정하세요',
+      draw: '홀마다 팀 대결 금액을 정하세요'
+    };
+    var BET_UNITS = {
+      stroke: '원 / 타',
+      skins: '원 / 홀',
+      draw: '원 / 홀'
+    };
+    var betAmount = 1000;
     var audioCtx = null;
+
+    function formatWon(n) {
+      return Math.round(n).toLocaleString('ko-KR') + '원';
+    }
 
     function transitionTo(fromEl, toEl, cb) {
       fromEl.classList.add('fade-out');
@@ -1004,9 +1200,11 @@
       flySrc.stop(flyStart + flyDur);
     }
 
-    // Synthesize a bright, cheerful "딸그랑" chime (bell-like ping, two quick
-    // ascending notes) for the ball dropping into the cup — Web Audio API,
-    // no external audio file needed.
+    // Synthesize the sound of a ball dropping into the cup — modeled after how
+    // golfers actually describe it (hollow rattle against the cup wall/liner,
+    // a bright plastic "plunk/knock", the ball settling at the bottom) rather
+    // than a pure bell tone, with a touch of bright shimmer to keep it cheerful.
+    // Web Audio API only — no external audio file needed.
     function playHoleSound() {
       var Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
@@ -1015,26 +1213,63 @@
       var ctx = audioCtx;
       var now = ctx.currentTime;
 
-      function ping(time, freq, dur, peak) {
-        var partials = [1, 2.42, 3.9];
-        var partialGains = [1, 0.45, 0.22];
-        partials.forEach(function (mult, i) {
-          var osc = ctx.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.value = freq * mult;
-          var g = ctx.createGain();
-          var pk = peak * partialGains[i];
-          g.gain.setValueAtTime(0.0001, time);
-          g.gain.linearRampToValueAtTime(pk, time + 0.006);
-          g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-          osc.connect(g).connect(ctx.destination);
-          osc.start(time);
-          osc.stop(time + dur + 0.05);
-        });
+      function noiseKnock(time, freq, q, dur, peak) {
+        var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        var d = buf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) {
+          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.6);
+        }
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        var filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = freq;
+        filter.Q.value = q;
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(peak, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
+        src.connect(filter).connect(gain).connect(ctx.destination);
+        src.start(time);
+        src.stop(time + dur);
       }
 
-      ping(now, 1568, 0.3, 0.5);          // 딸  (bright, short)
-      ping(now + 0.1, 2093, 0.45, 0.42);  // 그랑 (higher, trailing shimmer)
+      // 1) Bright plastic "plunk" — the ball first hitting the cup
+      noiseKnock(now, 2600, 3, 0.05, 0.75);
+
+      // 2) A thin metallic shimmer layered on the plunk for a cheerful edge
+      var shimmer = ctx.createOscillator();
+      shimmer.type = 'sine';
+      shimmer.frequency.value = 2400;
+      var shimmerGain = ctx.createGain();
+      shimmerGain.gain.setValueAtTime(0.0001, now);
+      shimmerGain.gain.linearRampToValueAtTime(0.18, now + 0.006);
+      shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      shimmer.connect(shimmerGain).connect(ctx.destination);
+      shimmer.start(now);
+      shimmer.stop(now + 0.15);
+
+      // 3) Hollow rattle — the ball bouncing against the cup wall/flagstick,
+      // a handful of quick decaying bounces, ringing slightly like plastic/metal
+      var rattleTimes = [0.045, 0.1, 0.15, 0.195, 0.235];
+      var rattleFreqs = [2000, 1600, 1300, 1050, 850];
+      rattleTimes.forEach(function (t, idx) {
+        noiseKnock(now + t, rattleFreqs[idx], 5, 0.05, 0.32 * (1 - idx * 0.14));
+      });
+
+      // 4) Settle — a short, moderate (not too low) resonant thunk as the ball
+      // comes to rest at the bottom of the cup
+      var settleStart = now + 0.27;
+      var settleOsc = ctx.createOscillator();
+      settleOsc.type = 'triangle';
+      settleOsc.frequency.setValueAtTime(340, settleStart);
+      settleOsc.frequency.exponentialRampToValueAtTime(220, settleStart + 0.12);
+      var settleGain = ctx.createGain();
+      settleGain.gain.setValueAtTime(0.0001, settleStart);
+      settleGain.gain.linearRampToValueAtTime(0.3, settleStart + 0.012);
+      settleGain.gain.exponentialRampToValueAtTime(0.0001, settleStart + 0.16);
+      settleOsc.connect(settleGain).connect(ctx.destination);
+      settleOsc.start(settleStart);
+      settleOsc.stop(settleStart + 0.17);
     }
 
     function renderNameInputs() {
@@ -1068,6 +1303,48 @@
       decBtn.disabled = playerCount <= MIN_PLAYERS;
       incBtn.disabled = playerCount >= MAX_PLAYERS;
     }
+
+    // ---- bet amount ----
+
+    function updateBetChipsActive() {
+      var chips = betChipRow.querySelectorAll('.bet-chip');
+      chips.forEach(function (c) {
+        c.classList.toggle('active', Number(c.getAttribute('data-amount')) === betAmount);
+      });
+    }
+
+    function renderBetChips() {
+      var presets = BET_PRESETS[selectedMode];
+      betAmount = presets[1];
+      betLabel.textContent = BET_LABELS[selectedMode] + ' (' + BET_UNITS[selectedMode] + ')';
+      betChipRow.innerHTML = '';
+      presets.forEach(function (amt) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'bet-chip';
+        chip.setAttribute('data-amount', amt);
+        chip.textContent = formatWon(amt);
+        chip.addEventListener('click', function () {
+          betAmount = amt;
+          betCustomInput.value = '';
+          updateBetChipsActive();
+          betCurrentDisplay.textContent = formatWon(betAmount);
+        });
+        betChipRow.appendChild(chip);
+      });
+      betCustomInput.value = '';
+      updateBetChipsActive();
+      betCurrentDisplay.textContent = formatWon(betAmount);
+    }
+
+    betCustomInput.addEventListener('input', function () {
+      var v = parseInt(betCustomInput.value, 10);
+      if (!isNaN(v) && v > 0) {
+        betAmount = v;
+        updateBetChipsActive();
+        betCurrentDisplay.textContent = formatWon(betAmount);
+      }
+    });
 
     // ---- team draw (뽑기) ----
 
@@ -1288,28 +1565,231 @@
       renderScoreHole();
     }
 
-    function finishScoring() {
+    function playerTotals() {
       var totals = [];
       for (var p = 0; p < playerCount; p++) {
         var sum = 0;
         for (var h = 0; h < HOLE_COUNT; h++) {
           if (scores[h][p] !== null) sum += scores[h][p];
         }
-        totals.push({ name: names[p] || (p + 1) + '번', total: sum });
+        totals.push(sum);
       }
-      totals.sort(function (a, b) { return a.total - b.total; });
+      return totals;
+    }
 
-      var filledHoles = 0;
-      for (var h2 = 0; h2 < HOLE_COUNT; h2++) if (isHoleFilled(h2)) filledHoles++;
+    // ---- 정산 (settlement) ----
 
-      var lines = totals.map(function (t, i) {
-        return (i + 1) + '위 ' + t.name + ': ' + formatScoreLabel(t.total);
+    function computeStrokeSettlement() {
+      var totals = playerTotals();
+      var net = [];
+      for (var z = 0; z < playerCount; z++) net.push(0);
+      var transactions = [];
+      for (var i = 0; i < playerCount; i++) {
+        for (var j = 0; j < playerCount; j++) {
+          if (i === j) continue;
+          if (totals[j] > totals[i]) {
+            var amt = (totals[j] - totals[i]) * betAmount;
+            net[i] += amt;
+            net[j] -= amt;
+            transactions.push({ from: j, to: i, amount: amt });
+          }
+        }
+      }
+      return { net: net, transactions: transactions };
+    }
+
+    function computeSkinsSettlement() {
+      var net = [];
+      for (var z = 0; z < playerCount; z++) net.push(0);
+      var log = [];
+      var carry = 0;
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        var row = scores[h];
+        if (!isHoleFilled(h)) continue;
+        var min = Math.min.apply(null, row.slice(0, playerCount));
+        var winners = [];
+        for (var p = 0; p < playerCount; p++) if (row[p] === min) winners.push(p);
+        if (winners.length === 1) {
+          var pot = (carry + 1) * betAmount;
+          var winner = winners[0];
+          var losers = [];
+          for (var p2 = 0; p2 < playerCount; p2++) if (p2 !== winner) losers.push(p2);
+          var share = pot / losers.length;
+          net[winner] += pot;
+          losers.forEach(function (l) { net[l] -= share; });
+          log.push({ hole: h + 1, winner: winner, pot: pot });
+          carry = 0;
+        } else {
+          carry++;
+          log.push({ hole: h + 1, winner: null, carry: carry });
+        }
+      }
+      return { net: net, log: log, unresolvedCarry: carry };
+    }
+
+    function computeDrawSettlement() {
+      var net = [];
+      for (var z = 0; z < playerCount; z++) net.push(0);
+      var log = [];
+      if (!teams) return { net: net, log: log };
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        var row = scores[h];
+        if (!isHoleFilled(h)) continue;
+        var avgs = teams.map(function (team) {
+          var s = 0;
+          team.forEach(function (idx) { s += row[idx]; });
+          return s / team.length;
+        });
+        var minAvg = Math.min.apply(null, avgs);
+        var winnerTeams = [];
+        var loserTeams = [];
+        teams.forEach(function (team, ti) {
+          if (avgs[ti] === minAvg) winnerTeams.push(ti); else loserTeams.push(ti);
+        });
+        if (loserTeams.length === 0) {
+          log.push({ hole: h + 1, tie: true });
+          continue;
+        }
+        var totalPot = betAmount * loserTeams.length;
+        var winnerShare = totalPot / winnerTeams.length;
+        winnerTeams.forEach(function (ti) {
+          var perMember = winnerShare / teams[ti].length;
+          teams[ti].forEach(function (idx) { net[idx] += perMember; });
+        });
+        loserTeams.forEach(function (ti) {
+          var perMember = betAmount / teams[ti].length;
+          teams[ti].forEach(function (idx) { net[idx] -= perMember; });
+        });
+        log.push({ hole: h + 1, winnerTeams: winnerTeams.slice() });
+      }
+      return { net: net, log: log };
+    }
+
+    function renderResultDetail(settlement) {
+      var html = '';
+      if (selectedMode === 'stroke') {
+        if (settlement.transactions.length === 0) {
+          html = '<p>전원 동타라 정산 내역이 없습니다.</p>';
+        } else {
+          settlement.transactions.forEach(function (t) {
+            var fromName = names[t.from] || (t.from + 1) + '번';
+            var toName = names[t.to] || (t.to + 1) + '번';
+            html += '<p>' + fromName + ' → ' + toName + ': ' + formatWon(t.amount) + '</p>';
+          });
+        }
+      } else if (selectedMode === 'skins') {
+        settlement.log.forEach(function (l) {
+          if (l.winner === null) {
+            html += '<p>' + l.hole + '홀: 동타 — 캐리오버 (누적 ' + l.carry + ')</p>';
+          } else {
+            var wName = names[l.winner] || (l.winner + 1) + '번';
+            html += '<p>' + l.hole + '홀: ' + wName + ' 승 — ' + formatWon(l.pot) + '</p>';
+          }
+        });
+        if (settlement.unresolvedCarry > 0) {
+          html += '<p><strong>마지막까지 동타로 남은 캐리오버 ' + settlement.unresolvedCarry + '회분은 이번 라운드에서는 지급되지 않았습니다.</strong></p>';
+        }
+      } else if (selectedMode === 'draw') {
+        settlement.log.forEach(function (l) {
+          if (l.tie) {
+            html += '<p>' + l.hole + '홀: 팀 동타 — 정산 없음</p>';
+          } else {
+            var label = l.winnerTeams.map(function (ti) { return (ti + 1) + '팀'; }).join(', ');
+            html += '<p>' + l.hole + '홀: ' + label + ' 승</p>';
+          }
+        });
+      }
+      if (!html) html = '<p>입력된 홀이 없어 정산 내역이 없습니다.</p>';
+      resultDetailBody.innerHTML = html;
+    }
+
+    function renderResultScreen() {
+      var settlement;
+      if (selectedMode === 'stroke') settlement = computeStrokeSettlement();
+      else if (selectedMode === 'skins') settlement = computeSkinsSettlement();
+      else settlement = computeDrawSettlement();
+
+      resultSubtitle.textContent = MODE_LABELS[selectedMode] + ' · ' + formatWon(betAmount) + ' ' + BET_UNITS[selectedMode].replace('원 ', '');
+
+      var totals = playerTotals();
+      var players = [];
+      for (var p = 0; p < playerCount; p++) {
+        players.push({
+          idx: p,
+          name: names[p] || (p + 1) + '번',
+          total: totals[p],
+          net: Math.round(settlement.net[p])
+        });
+      }
+      players.sort(function (a, b) { return b.net - a.net; });
+
+      resultList.innerHTML = '';
+      players.forEach(function (pl, rank) {
+        var row = document.createElement('div');
+        row.className = 'result-row';
+
+        var rankSpan = document.createElement('span');
+        rankSpan.className = 'result-rank';
+        rankSpan.textContent = rank + 1;
+        row.appendChild(rankSpan);
+
+        if (selectedMode === 'draw' && playerSuit[pl.idx]) {
+          var badge = document.createElement('span');
+          badge.className = 'score-team-badge';
+          badge.textContent = playerSuit[pl.idx];
+          badge.style.color = suitColor(playerSuit[pl.idx]);
+          row.appendChild(badge);
+        }
+
+        var nameSpan = document.createElement('span');
+        nameSpan.className = 'result-name';
+        nameSpan.textContent = pl.name;
+        row.appendChild(nameSpan);
+
+        var scoreSpan = document.createElement('span');
+        scoreSpan.className = 'result-score';
+        scoreSpan.textContent = formatScoreLabel(pl.total);
+        row.appendChild(scoreSpan);
+
+        var netSpan = document.createElement('span');
+        var netClass = pl.net > 0 ? 'positive' : (pl.net < 0 ? 'negative' : 'even');
+        netSpan.className = 'result-net ' + netClass;
+        netSpan.textContent = (pl.net > 0 ? '+' : '') + formatWon(pl.net);
+        row.appendChild(netSpan);
+
+        resultList.appendChild(row);
       });
-      alert(
-        '최종 스코어 (18홀 중 ' + filledHoles + '홀 입력)\n' +
-        lines.join('\n') +
-        '\n\n정산 화면은 준비 중입니다!'
-      );
+
+      resultDetails.removeAttribute('open');
+      renderResultDetail(settlement);
+    }
+
+    function finishScoring() {
+      transitionTo(screenScore, screenResult, renderResultScreen);
+    }
+
+    function resetAll() {
+      playerCount = 4;
+      names = [];
+      selectedMode = null;
+      teams = null;
+      playerSuit = {};
+      scores = [];
+      currentHole = 0;
+      betAmount = 1000;
+
+      var cards = modeList.querySelectorAll('.mode-card');
+      cards.forEach(function (c) { c.classList.remove('selected'); });
+
+      ball.classList.remove('hit');
+      startBtn.disabled = false;
+
+      [screenSetup, screenMode, screenBet, screenDraw, screenScore, screenResult].forEach(function (s) {
+        s.hidden = true;
+        s.classList.remove('fade-in', 'fade-out');
+      });
+      screenStart.hidden = false;
+      screenStart.classList.remove('fade-out');
     }
 
     decBtn.addEventListener('click', function () {
@@ -1394,16 +1874,24 @@
         alert('내기 방식을 선택해주세요.');
         return;
       }
+      transitionTo(screenMode, screenBet, renderBetChips);
+    });
+
+    betBackBtn.addEventListener('click', function () {
+      goBack(screenBet, screenMode);
+    });
+
+    betNextBtn.addEventListener('click', function () {
       if (selectedMode === 'draw') {
         renderDrawCards();
-        transitionTo(screenMode, screenDraw);
+        transitionTo(screenBet, screenDraw);
       } else {
-        transitionTo(screenMode, screenScore, enterScoreScreen);
+        transitionTo(screenBet, screenScore, enterScoreScreen);
       }
     });
 
     drawBackBtn.addEventListener('click', function () {
-      goBack(screenDraw, screenMode);
+      goBack(screenDraw, screenBet);
     });
 
     drawStartBtn.addEventListener('click', function () {
@@ -1441,7 +1929,7 @@
       if (selectedMode === 'draw') {
         goBack(screenScore, screenDraw);
       } else {
-        goBack(screenScore, screenMode);
+        goBack(screenScore, screenBet);
       }
     });
 
@@ -1456,6 +1944,16 @@
       } else {
         finishScoring();
       }
+    });
+
+    resultBackBtn.addEventListener('click', function () {
+      currentHole = HOLE_COUNT - 1;
+      goBack(screenResult, screenScore);
+      renderScoreHole();
+    });
+
+    resultRestartBtn.addEventListener('click', function () {
+      resetAll();
     });
   })();
   </script>
