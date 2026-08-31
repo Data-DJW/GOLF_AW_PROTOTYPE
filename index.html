@@ -8,6 +8,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  /* registering these as typed custom properties lets the browser animate
+     them directly — the sky can visibly drift instead of jump-cutting each
+     time the weather script recomputes it (older browsers just snap; the
+     page still works fine, only the transition is lost) */
+  @property --sun-x { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
+  @property --sun-y { syntax: '<percentage>'; inherits: true; initial-value: -8%; }
+  @property --sky-glow { syntax: '<color>'; inherits: true; initial-value: #1d4c2e; }
+  @property --sky-mid { syntax: '<color>'; inherits: true; initial-value: #0a2417; }
+  @property --sky-edge { syntax: '<color>'; inherits: true; initial-value: #04140c; }
+  @property --night-amount { syntax: '<number>'; inherits: true; initial-value: 0; }
+
   :root {
     --bg-0: #04140c;
     --bg-1: #0a2417;
@@ -20,13 +31,25 @@
     --gold: #d9b64a;
     --ink: #12241a;
     --ruby: #e2685c;
-    --glass: rgba(255, 255, 255, 0.045);
-    --glass-strong: rgba(255, 255, 255, 0.08);
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-strong: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(246, 241, 228, 0.14);
     --glass-border-gold: rgba(217, 182, 74, 0.5);
     --shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+
+    /* live sky state — the weather script recomputes these every few
+       minutes from real sunrise/sunset + conditions; defaults below
+       reproduce the original static night look until it first runs */
+    --sun-x: 50%;
+    --sun-y: -8%;
+    --sky-glow: #1d4c2e;
+    --sky-mid: #0a2417;
+    --sky-edge: #04140c;
+    --night-amount: 0;
+    transition: --sun-x 1.6s ease, --sun-y 1.6s ease, --sky-glow 1.6s ease,
+                --sky-mid 1.6s ease, --sky-edge 1.6s ease, --night-amount 1.6s ease;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -35,7 +58,7 @@
   body {
     font-family: var(--font-body);
     background:
-      radial-gradient(circle at 50% -8%, var(--bg-3), var(--bg-1) 52%, var(--bg-0) 100%);
+      radial-gradient(circle at var(--sun-x) var(--sun-y), var(--sky-glow), var(--sky-mid) 52%, var(--sky-edge) 100%);
     color: var(--cream);
     display: flex;
     align-items: center;
@@ -70,78 +93,66 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 
-  /* --- sky / weather widget: shows local sunrise-sunset position + weather --- */
-  .sky-widget {
+  /* --- live sky: a real sun/moon tracking sunrise→sunset across the course,
+     a star field at night, and rain/snow ambience — all driven by the
+     weather script below. Sits behind the cards (z-index 0) so it never
+     competes with the UI; the body's own background gradient (see above)
+     is recentred on the same --sun-x/--sun-y position as its light source. */
+  .celestial {
     position: fixed;
-    top: 0.9rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.45rem 0.9rem;
-    border-radius: 999px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: var(--shadow);
-    max-width: calc(100vw - 1.6rem);
-  }
-  .sky-icon {
-    font-size: 1.15rem;
-    line-height: 1;
-    flex: 0 0 auto;
-  }
-  .sky-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    min-width: 0;
-  }
-  .sky-condition {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: var(--cream-dim);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .sky-arc-track {
-    position: relative;
-    width: 110px;
-    height: 4px;
-    border-radius: 999px;
-    background: linear-gradient(90deg,
-      #1b2a4a 0%, #1b2a4a 18%,
-      #e08a4d 25%, #bcd9f2 40%,
-      #bcd9f2 60%, #e08a4d 75%,
-      #1b2a4a 82%, #1b2a4a 100%);
-  }
-  .sky-tick {
-    position: absolute;
-    top: -2px;
-    width: 2px;
-    height: 8px;
-    background: rgba(246, 241, 228, 0.55);
-    border-radius: 1px;
-    transform: translateX(-50%);
-  }
-  .sky-arc-dot {
-    position: absolute;
-    top: 50%;
-    width: 9px;
-    height: 9px;
+    left: var(--sun-x);
+    top: var(--sun-y);
+    width: 58px;
+    height: 58px;
+    margin: -29px 0 0 -29px;
     border-radius: 50%;
-    background: var(--gold-1);
-    box-shadow: 0 0 6px rgba(243, 218, 142, 0.9);
-    transform: translate(-50%, -50%);
-    transition: left 0.6s ease;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--body-color, #f3da8e);
+    box-shadow: 0 0 70px 20px var(--body-halo, rgba(243, 218, 142, 0.4));
+    opacity: var(--body-opacity, 1);
+    transition: left 1.6s ease, top 1.6s ease, opacity 1.2s ease, background 1.6s ease, box-shadow 1.6s ease;
+  }
+  .celestial.is-moon::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 32%, rgba(20, 30, 50, 0.16) 9%, transparent 10%),
+      radial-gradient(circle at 62% 55%, rgba(20, 30, 50, 0.12) 11%, transparent 12%),
+      radial-gradient(circle at 45% 72%, rgba(20, 30, 50, 0.1) 7%, transparent 8%);
   }
 
-  /* rain / snow ambience overlay, sits above the fairway pattern but below the card */
+  .star-field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: var(--night-amount);
+    transition: opacity 1.8s ease;
+  }
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #f4f7ff;
+  }
+  .star.big {
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 4px rgba(244, 247, 255, 0.8);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .star.twinkle { animation: twinkle 3.4s ease-in-out infinite; }
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* rain / snow ambience overlay, sits above the sky but below the card */
   .weather-fx {
     position: fixed;
     inset: 0;
@@ -172,6 +183,41 @@
     0% { transform: translate(0, 0); }
     50% { transform: translate(10px, 58vh); }
     100% { transform: translate(-8px, 120vh); }
+  }
+
+  /* compact current-conditions readout — the sky itself now shows time/
+     position, so this only needs to name the place and the weather */
+  .sky-widget {
+    position: fixed;
+    top: 0.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.05rem;
+    border-radius: 999px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border-gold);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+    max-width: calc(100vw - 1.6rem);
+  }
+  .sky-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+  .sky-condition {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--cream-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .stage {
@@ -985,18 +1031,14 @@
 </style>
 </head>
 <body>
+  <div class="celestial" id="celestial" aria-hidden="true"></div>
+  <div class="star-field" id="starField" aria-hidden="true"></div>
+  <div class="weather-fx" id="weatherFx" hidden></div>
+
   <div class="sky-widget" id="skyWidget" aria-hidden="true">
     <span class="sky-icon" id="skyIcon">🕒</span>
-    <div class="sky-info">
-      <span class="sky-condition" id="skyCondition">위치 확인 중...</span>
-      <div class="sky-arc-track">
-        <span class="sky-tick" id="skyTickSunrise" style="left:25%"></span>
-        <span class="sky-tick" id="skyTickSunset" style="left:75%"></span>
-        <span class="sky-arc-dot" id="skyArcDot" style="left:50%"></span>
-      </div>
-    </div>
+    <span class="sky-condition" id="skyCondition">위치 확인 중...</span>
   </div>
-  <div class="weather-fx" id="weatherFx" hidden></div>
 
   <div class="stage" id="screen-start">
     <div class="ball-wrap">
@@ -2190,16 +2232,18 @@
   </script>
 
   <script>
-  // Sky/weather widget: IP 기반 위치 → 실시간 날씨/일출·일몰로 해/달 위치와
-  // 비/눈 여부를 표시. 위치·날씨 조회가 실패하면(네트워크 차단 등) 기기 시간
-  // 기준으로 06:00~18:00을 낮으로 가정해 동→서 이동만 표시하는 방식으로 폴백.
+  // Live sky: 브라우저 위치 권한(정확)을 먼저 시도하고, 거부/미지원 시
+  // 접속 IP 기반 위치(도시 단위로 부정확할 수 있음)로 대체한 뒤, 그 좌표의
+  // 실시간 날씨 + 오늘 일출·일몰로 해/달의 실제 위치·색과 배경 하늘, 비/눈
+  // 연출을 계산한다. 위치·날씨 조회가 전부 실패하면(네트워크 차단 등) 기기
+  // 시간만으로 06:00~18:00을 낮으로 가정해 동→서 이동만 표시하는 방식으로 폴백.
   (function () {
     var skyIcon = document.getElementById('skyIcon');
     var skyCondition = document.getElementById('skyCondition');
-    var skyArcDot = document.getElementById('skyArcDot');
-    var skyTickSunrise = document.getElementById('skyTickSunrise');
-    var skyTickSunset = document.getElementById('skyTickSunset');
     var weatherFx = document.getElementById('weatherFx');
+    var celestial = document.getElementById('celestial');
+    var starField = document.getElementById('starField');
+    var root = document.documentElement.style;
 
     // WMO weather code -> 표시 텍스트/아이콘/강수 종류
     var WEATHER_MAP = {
@@ -2261,6 +2305,24 @@
       weatherFx.hidden = false;
     }
 
+    var STARS_BUILT_COUNT = 40;
+    var starsBuilt = false;
+    function buildStars() {
+      if (starsBuilt) return;
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < STARS_BUILT_COUNT; i++) {
+        var s = document.createElement('span');
+        s.className = 'star' + (Math.random() < 0.3 ? ' big' : '') + (Math.random() < 0.6 ? ' twinkle' : '');
+        s.style.left = (Math.random() * 100) + '%';
+        s.style.top = (Math.random() * 55) + '%';
+        s.style.animationDelay = (Math.random() * -3.4) + 's';
+        frag.appendChild(s);
+      }
+      starField.appendChild(frag);
+      starsBuilt = true;
+    }
+    buildStars();
+
     // "YYYY-MM-DDTHH:MM" 형식(현지 시각, timezone=auto)에서 자정 이후 경과 분을 추출
     function minutesOfDay(isoStr) {
       var t = (isoStr.split('T')[1] || '00:00').split(':');
@@ -2273,10 +2335,6 @@
       var ampm = h < 12 ? '오전' : '오후';
       var h12 = h % 12; if (h12 === 0) h12 = 12;
       return ampm + ' ' + h12 + ':' + (m < 10 ? '0' : '') + m;
-    }
-
-    function positionDot(minutes) {
-      skyArcDot.style.left = Math.max(0, Math.min(100, minutes / 1440 * 100)) + '%';
     }
 
     function fetchJson(url, ms) {
@@ -2293,17 +2351,130 @@
       });
     }
 
-    // 폴백: IP/날씨 조회가 안 될 때, 기기 시간 기준으로 06:00~18:00을 낮으로
-    // 가정하고 해/달을 동(왼쪽)에서 서(오른쪽)로만 이동시켜 표시
+    // --- 위치: 브라우저 GPS/Wi-Fi 위치(정확) 우선, 실패 시 접속 IP(대략적,
+    // 특히 국내 통신사 IP는 실제 접속지와 다른 도시로 잡히는 경우가 흔함) ---
+    function getBrowserLocation(ms) {
+      return new Promise(function (resolve, reject) {
+        if (!('geolocation' in navigator)) { reject(new Error('no geolocation api')); return; }
+        var done = false;
+        var timer = setTimeout(function () {
+          if (done) return;
+          done = true;
+          reject(new Error('geolocation timeout'));
+        }, ms);
+        navigator.geolocation.getCurrentPosition(function (pos) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+        }, function (err) {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          reject(err);
+        }, { enableHighAccuracy: false, timeout: ms, maximumAge: 10 * 60 * 1000 });
+      });
+    }
+
+    function reverseGeocode(lat, lon) {
+      var url = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat +
+        '&longitude=' + lon + '&localityLanguage=ko';
+      return fetchJson(url, 4000).then(function (r) {
+        return r.city || r.locality || r.principalSubdivision || '';
+      }).catch(function () { return ''; });
+    }
+
+    function weatherFor(lat, lon) {
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat +
+        '&longitude=' + lon + '&current=weather_code,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
+      return fetchJson(url, 4000);
+    }
+
+    // --- 색 보간 유틸 ---
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpColor(c1, c2, t) { return [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)]; }
+    function rgbStr(c) { return 'rgb(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ')'; }
+
+    // 하늘 색 3단계(글로우/중간/외곽) — night는 기존 고정 디자인과 완전히 동일한 값
+    var NIGHT = { glow: [29, 76, 46], mid: [10, 36, 23], edge: [4, 20, 12] };
+    var TWILIGHT = { glow: [168, 104, 64], mid: [54, 34, 26], edge: [10, 16, 11] };
+    var DAY = { glow: [58, 140, 74], mid: [24, 64, 36], edge: [7, 24, 15] };
+    var RAIN_TINT = [58, 74, 86];
+    var SNOW_TINT = [214, 226, 232];
+    var CLOUD_TINT = [70, 78, 80];
+
+    // now/sunrise/sunset(분 단위, 자정 기준)과 날씨로 하늘 전체(배경, 해/달 위치·색,
+    // 별) 상태를 계산해 적용한다. weatherInfo가 없으면(폴백) 맑음으로 취급.
+    function renderSkyState(nowMin, sunriseMin, sunsetMin, weatherInfo) {
+      var altitude; // -1(자정) ~ 0(일출/일몰) ~ +1(정오)
+      if (nowMin >= sunriseMin && nowMin < sunsetMin) {
+        var f = (nowMin - sunriseMin) / (sunsetMin - sunriseMin);
+        altitude = Math.sin(Math.PI * f);
+      } else {
+        var nightLen = (1440 - sunsetMin) + sunriseMin;
+        var t = nowMin >= sunsetMin ? (nowMin - sunsetMin) : (nowMin + 1440 - sunsetMin);
+        var f2 = nightLen > 0 ? (t / nightLen) : 0;
+        altitude = -Math.sin(Math.PI * f2);
+      }
+      var dayW = Math.max(0, altitude);
+      var nightW = Math.max(0, -altitude);
+      var twilightW = Math.max(0, 1 - dayW - nightW);
+
+      var blend = function (key) {
+        return [
+          NIGHT[key][0] * nightW + TWILIGHT[key][0] * twilightW + DAY[key][0] * dayW,
+          NIGHT[key][1] * nightW + TWILIGHT[key][1] * twilightW + DAY[key][1] * dayW,
+          NIGHT[key][2] * nightW + TWILIGHT[key][2] * twilightW + DAY[key][2] * dayW
+        ];
+      };
+      var glow = blend('glow'), mid = blend('mid'), edge = blend('edge');
+
+      var precip = weatherInfo && weatherInfo.precip;
+      if (precip === 'rain') {
+        glow = lerpColor(glow, RAIN_TINT, 0.32); mid = lerpColor(mid, RAIN_TINT, 0.22); edge = lerpColor(edge, RAIN_TINT, 0.12);
+      } else if (precip === 'snow') {
+        glow = lerpColor(glow, SNOW_TINT, 0.2); mid = lerpColor(mid, SNOW_TINT, 0.1);
+      } else if (weatherInfo && weatherInfo.cloudy) {
+        glow = lerpColor(glow, CLOUD_TINT, 0.18); mid = lerpColor(mid, CLOUD_TINT, 0.1);
+      }
+
+      root.setProperty('--sky-glow', rgbStr(glow));
+      root.setProperty('--sky-mid', rgbStr(mid));
+      root.setProperty('--sky-edge', rgbStr(edge));
+      root.setProperty('--night-amount', String(nightW));
+
+      // 해/달: 하루 동안 동(0%)→서(100%)로 이동, 뜨고 질 때는 지평선 가까이,
+      // 정오/자정에는 하늘 높이 — 실제 궤적처럼 포물선으로 오르내리게 함
+      var sunX = (nowMin / 1440) * 100;
+      var mag = Math.max(dayW, nightW);
+      var sunY = 58 - mag * 50;
+      root.setProperty('--sun-x', sunX + '%');
+      root.setProperty('--sun-y', sunY + '%');
+
+      var isDayNow = dayW >= nightW;
+      celestial.classList.toggle('is-moon', !isDayNow);
+      if (isDayNow) {
+        var warmth = 1 - dayW; // 지평선 근처일수록 붉고 따뜻하게, 정오엔 하얗게
+        var sunColor = lerpColor([255, 244, 214], [255, 190, 110], warmth);
+        celestial.style.setProperty('--body-color', rgbStr(sunColor));
+        celestial.style.setProperty('--body-halo', 'rgba(' + Math.round(sunColor[0]) + ',' + Math.round(sunColor[1]) + ',' + Math.round(sunColor[2]) + ',' + (0.45 - warmth * 0.1) + ')');
+      } else {
+        celestial.style.setProperty('--body-color', '#e7ecf7');
+        celestial.style.setProperty('--body-halo', 'rgba(210,220,245,0.28)');
+      }
+      var dimmed = !!(weatherInfo && (weatherInfo.precip || weatherInfo.cloudy));
+      celestial.style.setProperty('--body-opacity', dimmed ? '0.35' : '1');
+    }
+
+    // 폴백: 위치/날씨 조회가 전부 안 될 때, 기기 시간 기준으로 06:00~18:00을
+    // 낮으로 가정하고 해/달을 동→서로만 이동시켜 표시 (날씨 정보 없음)
     function applyFallbackSky() {
       var now = new Date();
       var minutes = now.getHours() * 60 + now.getMinutes();
       var isDay = minutes >= 360 && minutes < 1080;
       skyIcon.textContent = isDay ? '☀️' : '🌙';
       skyCondition.textContent = '기기 시간 기준 · ' + formatKoreanTime(minutes);
-      skyTickSunrise.style.left = (360 / 1440 * 100) + '%';
-      skyTickSunset.style.left = (1080 / 1440 * 100) + '%';
-      positionDot(minutes);
+      renderSkyState(minutes, 360, 1080, null);
       setWeatherFx(null);
     }
 
@@ -2313,17 +2484,14 @@
       var info = WEATHER_MAP[current.weather_code] || WEATHER_MAP[0];
       var isDay = current.is_day !== 0;
       var nowMinutes = minutesOfDay(current.time || '');
+      var sunriseMin = (daily.sunrise && daily.sunrise[0]) ? minutesOfDay(daily.sunrise[0]) : 360;
+      var sunsetMin = (daily.sunset && daily.sunset[0]) ? minutesOfDay(daily.sunset[0]) : 1080;
+      var cloudy = !info.precip && current.weather_code !== 0 && current.weather_code !== 1;
 
       skyIcon.textContent = isDay ? info.icon : info.nightIcon;
       skyCondition.textContent = (placeLabel ? placeLabel + ' · ' : '') + info.text + ' · ' + formatKoreanTime(nowMinutes);
 
-      if (daily.sunrise && daily.sunrise[0]) {
-        skyTickSunrise.style.left = (minutesOfDay(daily.sunrise[0]) / 1440 * 100) + '%';
-      }
-      if (daily.sunset && daily.sunset[0]) {
-        skyTickSunset.style.left = (minutesOfDay(daily.sunset[0]) / 1440 * 100) + '%';
-      }
-      positionDot(nowMinutes);
+      renderSkyState(nowMinutes, sunriseMin, sunsetMin, { precip: info.precip, cloudy: cloudy });
       setWeatherFx(info.precip);
     }
 
@@ -2332,21 +2500,28 @@
         applyFallbackSky();
         return;
       }
-      // 1) 접속 IP로 대략적 위치(도시/좌표) 조회
-      fetchJson('https://get.geojs.io/v1/ip/geo.json', 4000)
-        .then(function (geo) {
-          var lat = parseFloat(geo.latitude);
-          var lon = parseFloat(geo.longitude);
-          if (!isFinite(lat) || !isFinite(lon)) throw new Error('no coords');
-          // 2) 해당 좌표의 실시간 날씨 + 오늘 일출/일몰
-          var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat +
-            '&longitude=' + lon + '&current=weather_code,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
-          return fetchJson(url, 4000).then(function (wx) {
-            applySky(wx, geo.city || geo.country || '');
+      // 1) 브라우저 위치 권한으로 정확한 좌표 시도
+      getBrowserLocation(6000)
+        .then(function (loc) {
+          return reverseGeocode(loc.lat, loc.lon).then(function (place) {
+            return weatherFor(loc.lat, loc.lon).then(function (wx) {
+              applySky(wx, place);
+            });
           });
         })
         .catch(function () {
-          // 위치/날씨 조회 실패 시 기기 시간 기반으로 폴백
+          // 2) 거부/미지원/타임아웃 시 접속 IP로 대략적 위치 조회
+          return fetchJson('https://get.geojs.io/v1/ip/geo.json', 4000).then(function (geo) {
+            var lat = parseFloat(geo.latitude);
+            var lon = parseFloat(geo.longitude);
+            if (!isFinite(lat) || !isFinite(lon)) throw new Error('no coords');
+            return weatherFor(lat, lon).then(function (wx) {
+              applySky(wx, geo.city || geo.country || '');
+            });
+          });
+        })
+        .catch(function () {
+          // 3) 위치/날씨 조회가 전부 실패하면 기기 시간 기반으로 폴백
           applyFallbackSky();
         });
     }
