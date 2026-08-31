@@ -70,6 +70,110 @@
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   }
 
+  /* --- sky / weather widget: shows local sunrise-sunset position + weather --- */
+  .sky-widget {
+    position: fixed;
+    top: 0.9rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow);
+    max-width: calc(100vw - 1.6rem);
+  }
+  .sky-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+    flex: 0 0 auto;
+  }
+  .sky-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+  .sky-condition {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--cream-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sky-arc-track {
+    position: relative;
+    width: 110px;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg,
+      #1b2a4a 0%, #1b2a4a 18%,
+      #e08a4d 25%, #bcd9f2 40%,
+      #bcd9f2 60%, #e08a4d 75%,
+      #1b2a4a 82%, #1b2a4a 100%);
+  }
+  .sky-tick {
+    position: absolute;
+    top: -2px;
+    width: 2px;
+    height: 8px;
+    background: rgba(246, 241, 228, 0.55);
+    border-radius: 1px;
+    transform: translateX(-50%);
+  }
+  .sky-arc-dot {
+    position: absolute;
+    top: 50%;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--gold-1);
+    box-shadow: 0 0 6px rgba(243, 218, 142, 0.9);
+    transform: translate(-50%, -50%);
+    transition: left 0.6s ease;
+  }
+
+  /* rain / snow ambience overlay, sits above the fairway pattern but below the card */
+  .weather-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .weather-fx .drop {
+    position: absolute;
+    top: -8%;
+    width: 1.5px;
+    height: 56px;
+    background: linear-gradient(to bottom, transparent, rgba(200, 220, 255, 0.55));
+    animation: fall linear infinite;
+  }
+  .weather-fx[data-type="snow"] .drop {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+    animation-name: fallSnow;
+  }
+  @keyframes fall {
+    to { transform: translateY(120vh); }
+  }
+  @keyframes fallSnow {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(10px, 58vh); }
+    100% { transform: translate(-8px, 120vh); }
+  }
+
   .stage {
     position: relative;
     z-index: 1;
@@ -881,6 +985,19 @@
 </style>
 </head>
 <body>
+  <div class="sky-widget" id="skyWidget" aria-hidden="true">
+    <span class="sky-icon" id="skyIcon">🕒</span>
+    <div class="sky-info">
+      <span class="sky-condition" id="skyCondition">위치 확인 중...</span>
+      <div class="sky-arc-track">
+        <span class="sky-tick" id="skyTickSunrise" style="left:25%"></span>
+        <span class="sky-tick" id="skyTickSunset" style="left:75%"></span>
+        <span class="sky-arc-dot" id="skyArcDot" style="left:50%"></span>
+      </div>
+    </div>
+  </div>
+  <div class="weather-fx" id="weatherFx" hidden></div>
+
   <div class="stage" id="screen-start">
     <div class="ball-wrap">
       <div class="golf-ball" id="golfBall" aria-hidden="true"></div>
@@ -1469,7 +1586,7 @@
         for (var k = 0; k < order.length; k += 2) {
           teams.push(order.slice(k, k + 2));
         }
-        if (teams.length > 1 && teams[teams.length - 1].length === 1) {
+        if (teams.length > 2 && teams[teams.length - 1].length === 1) {
           var leftover = teams.pop();
           teams[teams.length - 1] = teams[teams.length - 1].concat(leftover);
         }
@@ -1592,6 +1709,13 @@
         if (scores[h][p] === null) return false;
       }
       return true;
+    }
+
+    function firstUnfilledHole() {
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        if (!isHoleFilled(h)) return h;
+      }
+      return -1;
     }
 
     function renderScoreHole() {
@@ -2042,6 +2166,13 @@
         currentHole++;
         renderScoreHole();
       } else {
+        var missing = firstUnfilledHole();
+        if (missing !== -1) {
+          alert((missing + 1) + '홀의 스코어가 아직 입력되지 않았습니다. 해당 홀로 이동합니다.');
+          currentHole = missing;
+          renderScoreHole();
+          return;
+        }
         finishScoring();
       }
     });
@@ -2055,6 +2186,173 @@
     resultRestartBtn.addEventListener('click', function () {
       resetAll();
     });
+  })();
+  </script>
+
+  <script>
+  // Sky/weather widget: IP 기반 위치 → 실시간 날씨/일출·일몰로 해/달 위치와
+  // 비/눈 여부를 표시. 위치·날씨 조회가 실패하면(네트워크 차단 등) 기기 시간
+  // 기준으로 06:00~18:00을 낮으로 가정해 동→서 이동만 표시하는 방식으로 폴백.
+  (function () {
+    var skyIcon = document.getElementById('skyIcon');
+    var skyCondition = document.getElementById('skyCondition');
+    var skyArcDot = document.getElementById('skyArcDot');
+    var skyTickSunrise = document.getElementById('skyTickSunrise');
+    var skyTickSunset = document.getElementById('skyTickSunset');
+    var weatherFx = document.getElementById('weatherFx');
+
+    // WMO weather code -> 표시 텍스트/아이콘/강수 종류
+    var WEATHER_MAP = {
+      0: { text: '맑음', icon: '☀️', nightIcon: '🌙', precip: null },
+      1: { text: '대체로 맑음', icon: '🌤️', nightIcon: '🌙', precip: null },
+      2: { text: '구름 조금', icon: '⛅', nightIcon: '☁️', precip: null },
+      3: { text: '흐림', icon: '☁️', nightIcon: '☁️', precip: null },
+      45: { text: '안개', icon: '🌫️', nightIcon: '🌫️', precip: null },
+      48: { text: '안개', icon: '🌫️', nightIcon: '🌫️', precip: null },
+      51: { text: '이슬비', icon: '🌦️', nightIcon: '🌦️', precip: 'rain' },
+      53: { text: '이슬비', icon: '🌦️', nightIcon: '🌦️', precip: 'rain' },
+      55: { text: '이슬비', icon: '🌦️', nightIcon: '🌦️', precip: 'rain' },
+      56: { text: '어는 이슬비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      57: { text: '어는 이슬비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      61: { text: '비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      63: { text: '비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      65: { text: '강한 비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      66: { text: '어는 비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      67: { text: '어는 비', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      71: { text: '눈', icon: '❄️', nightIcon: '❄️', precip: 'snow' },
+      73: { text: '눈', icon: '❄️', nightIcon: '❄️', precip: 'snow' },
+      75: { text: '강한 눈', icon: '❄️', nightIcon: '❄️', precip: 'snow' },
+      77: { text: '싸락눈', icon: '❄️', nightIcon: '❄️', precip: 'snow' },
+      80: { text: '소나기', icon: '🌦️', nightIcon: '🌦️', precip: 'rain' },
+      81: { text: '소나기', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      82: { text: '강한 소나기', icon: '🌧️', nightIcon: '🌧️', precip: 'rain' },
+      85: { text: '눈 소나기', icon: '🌨️', nightIcon: '🌨️', precip: 'snow' },
+      86: { text: '강한 눈 소나기', icon: '🌨️', nightIcon: '🌨️', precip: 'snow' },
+      95: { text: '뇌우', icon: '⛈️', nightIcon: '⛈️', precip: 'rain' },
+      96: { text: '뇌우(우박)', icon: '⛈️', nightIcon: '⛈️', precip: 'rain' },
+      99: { text: '뇌우(강한 우박)', icon: '⛈️', nightIcon: '⛈️', precip: 'rain' }
+    };
+
+    var PARTICLE_COUNT = 46;
+    var particlesBuilt = false;
+
+    function buildParticles() {
+      if (particlesBuilt) return;
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < PARTICLE_COUNT; i++) {
+        var el = document.createElement('span');
+        el.className = 'drop';
+        el.style.left = (Math.random() * 100) + '%';
+        el.style.animationDuration = (0.7 + Math.random() * 0.9) + 's';
+        el.style.animationDelay = (Math.random() * -2) + 's';
+        frag.appendChild(el);
+      }
+      weatherFx.appendChild(frag);
+      particlesBuilt = true;
+    }
+
+    function setWeatherFx(precip) {
+      if (!precip) {
+        weatherFx.hidden = true;
+        return;
+      }
+      buildParticles();
+      weatherFx.setAttribute('data-type', precip);
+      weatherFx.hidden = false;
+    }
+
+    // "YYYY-MM-DDTHH:MM" 형식(현지 시각, timezone=auto)에서 자정 이후 경과 분을 추출
+    function minutesOfDay(isoStr) {
+      var t = (isoStr.split('T')[1] || '00:00').split(':');
+      return parseInt(t[0], 10) * 60 + parseInt(t[1], 10);
+    }
+
+    function formatKoreanTime(minutes) {
+      var h = Math.floor(minutes / 60);
+      var m = minutes % 60;
+      var ampm = h < 12 ? '오전' : '오후';
+      var h12 = h % 12; if (h12 === 0) h12 = 12;
+      return ampm + ' ' + h12 + ':' + (m < 10 ? '0' : '') + m;
+    }
+
+    function positionDot(minutes) {
+      skyArcDot.style.left = Math.max(0, Math.min(100, minutes / 1440 * 100)) + '%';
+    }
+
+    function fetchJson(url, ms) {
+      var hasAbort = ('AbortController' in window);
+      var controller = hasAbort ? new AbortController() : null;
+      var timer = hasAbort ? setTimeout(function () { controller.abort(); }, ms) : null;
+      return fetch(url, hasAbort ? { signal: controller.signal } : {}).then(function (res) {
+        if (timer) clearTimeout(timer);
+        if (!res.ok) throw new Error('bad response: ' + res.status);
+        return res.json();
+      }, function (err) {
+        if (timer) clearTimeout(timer);
+        throw err;
+      });
+    }
+
+    // 폴백: IP/날씨 조회가 안 될 때, 기기 시간 기준으로 06:00~18:00을 낮으로
+    // 가정하고 해/달을 동(왼쪽)에서 서(오른쪽)로만 이동시켜 표시
+    function applyFallbackSky() {
+      var now = new Date();
+      var minutes = now.getHours() * 60 + now.getMinutes();
+      var isDay = minutes >= 360 && minutes < 1080;
+      skyIcon.textContent = isDay ? '☀️' : '🌙';
+      skyCondition.textContent = '기기 시간 기준 · ' + formatKoreanTime(minutes);
+      skyTickSunrise.style.left = (360 / 1440 * 100) + '%';
+      skyTickSunset.style.left = (1080 / 1440 * 100) + '%';
+      positionDot(minutes);
+      setWeatherFx(null);
+    }
+
+    function applySky(wx, placeLabel) {
+      var current = wx.current || {};
+      var daily = wx.daily || {};
+      var info = WEATHER_MAP[current.weather_code] || WEATHER_MAP[0];
+      var isDay = current.is_day !== 0;
+      var nowMinutes = minutesOfDay(current.time || '');
+
+      skyIcon.textContent = isDay ? info.icon : info.nightIcon;
+      skyCondition.textContent = (placeLabel ? placeLabel + ' · ' : '') + info.text + ' · ' + formatKoreanTime(nowMinutes);
+
+      if (daily.sunrise && daily.sunrise[0]) {
+        skyTickSunrise.style.left = (minutesOfDay(daily.sunrise[0]) / 1440 * 100) + '%';
+      }
+      if (daily.sunset && daily.sunset[0]) {
+        skyTickSunset.style.left = (minutesOfDay(daily.sunset[0]) / 1440 * 100) + '%';
+      }
+      positionDot(nowMinutes);
+      setWeatherFx(info.precip);
+    }
+
+    function initSky() {
+      if (typeof fetch !== 'function') {
+        applyFallbackSky();
+        return;
+      }
+      // 1) 접속 IP로 대략적 위치(도시/좌표) 조회
+      fetchJson('https://get.geojs.io/v1/ip/geo.json', 4000)
+        .then(function (geo) {
+          var lat = parseFloat(geo.latitude);
+          var lon = parseFloat(geo.longitude);
+          if (!isFinite(lat) || !isFinite(lon)) throw new Error('no coords');
+          // 2) 해당 좌표의 실시간 날씨 + 오늘 일출/일몰
+          var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat +
+            '&longitude=' + lon + '&current=weather_code,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
+          return fetchJson(url, 4000).then(function (wx) {
+            applySky(wx, geo.city || geo.country || '');
+          });
+        })
+        .catch(function () {
+          // 위치/날씨 조회 실패 시 기기 시간 기반으로 폴백
+          applyFallbackSky();
+        });
+    }
+
+    initSky();
+    setInterval(initSky, 5 * 60 * 1000);
   })();
   </script>
 </body>
