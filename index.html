@@ -6,7 +6,7 @@
 <title>Golf Betting Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet">
 <style>
   /* registering these as typed custom properties lets the browser animate
      them directly — the sky can visibly drift instead of jump-cutting each
@@ -20,33 +20,35 @@
   @property --night-amount { syntax: '<number>'; inherits: true; initial-value: 0; }
 
   :root {
-    --bg-0: #04140c;
-    --bg-1: #0a2417;
-    --bg-2: #123522;
-    --bg-3: #1d4c2e;
-    --cream: #f6f1e4;
-    --cream-dim: rgba(246, 241, 228, 0.72);
-    --gold-1: #f3da8e;
-    --gold-2: #c89b2c;
-    --gold: #d9b64a;
-    --ink: #12241a;
-    --ruby: #e2685c;
-    --glass: rgba(255, 255, 255, 0.06);
-    --glass-strong: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(246, 241, 228, 0.14);
-    --glass-border-gold: rgba(217, 182, 74, 0.5);
-    --shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
-    --font-display: 'Fraunces', Georgia, serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+    /* candy-galaxy palette: same light/dark roles as before (bg-0..3 dark,
+       cream/gold bright, ink dark-on-bright), just recolored pink/purple */
+    --bg-0: #1a1033;
+    --bg-1: #2d1b54;
+    --bg-2: #422a72;
+    --bg-3: #6b3fa0;
+    --cream: #fff2f8;
+    --cream-dim: rgba(255, 242, 248, 0.78);
+    --gold-1: #ffd93d;
+    --gold-2: #ff6fa8;
+    --gold: #ff8fc7;
+    --ink: #4a2d5c;
+    --ruby: #ff6b6b;
+    --glass: rgba(255, 255, 255, 0.12);
+    --glass-strong: rgba(255, 255, 255, 0.2);
+    --glass-border: rgba(255, 242, 248, 0.22);
+    --glass-border-gold: rgba(255, 143, 199, 0.55);
+    --shadow: 0 14px 30px rgba(45, 15, 60, 0.35);
+    --font-display: 'Jua', 'Gowun Dodum', "Malgun Gothic", sans-serif;
+    --font-body: 'Gowun Dodum', -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
 
     /* live sky state — the weather script recomputes these every few
        minutes from real sunrise/sunset + conditions; defaults below
        reproduce the original static night look until it first runs */
     --sun-x: 50%;
     --sun-y: -8%;
-    --sky-glow: #1d4c2e;
-    --sky-mid: #0a2417;
-    --sky-edge: #04140c;
+    --sky-glow: #6b3fa0;
+    --sky-mid: #2d1b54;
+    --sky-edge: #1a1033;
     --night-amount: 0;
     transition: --sun-x 1.6s ease, --sun-y 1.6s ease, --sky-glow 1.6s ease,
                 --sky-mid 1.6s ease, --sky-edge 1.6s ease, --night-amount 1.6s ease;
@@ -108,20 +110,22 @@
     border-radius: 50%;
     z-index: 0;
     pointer-events: none;
-    background: var(--body-color, #f3da8e);
-    box-shadow: 0 0 70px 20px var(--body-halo, rgba(243, 218, 142, 0.4));
+    background: var(--body-color, #ffd93d);
+    box-shadow: 0 0 70px 20px var(--body-halo, rgba(255, 217, 61, 0.4));
     opacity: var(--body-opacity, 1);
     transition: left 1.6s ease, top 1.6s ease, opacity 1.2s ease, background 1.6s ease, box-shadow 1.6s ease;
   }
+  /* a sleepy, blushing crescent-ish moon face at night */
   .celestial.is-moon::before {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: 50%;
     background:
-      radial-gradient(circle at 30% 32%, rgba(20, 30, 50, 0.16) 9%, transparent 10%),
-      radial-gradient(circle at 62% 55%, rgba(20, 30, 50, 0.12) 11%, transparent 12%),
-      radial-gradient(circle at 45% 72%, rgba(20, 30, 50, 0.1) 7%, transparent 8%);
+      radial-gradient(circle at 30% 32%, rgba(120, 60, 110, 0.14) 9%, transparent 10%),
+      radial-gradient(circle at 62% 55%, rgba(120, 60, 110, 0.1) 11%, transparent 12%),
+      radial-gradient(circle at 24% 58%, rgba(255, 143, 199, 0.55) 12%, transparent 13%),
+      radial-gradient(circle at 74% 58%, rgba(255, 143, 199, 0.55) 12%, transparent 13%);
   }
 
   .star-field {
@@ -137,12 +141,12 @@
     width: 2px;
     height: 2px;
     border-radius: 50%;
-    background: #f4f7ff;
+    background: #ffe9f5;
   }
   .star.big {
     width: 3px;
     height: 3px;
-    box-shadow: 0 0 4px rgba(244, 247, 255, 0.8);
+    box-shadow: 0 0 4px rgba(255, 233, 245, 0.85);
   }
   @media (prefers-reduced-motion: no-preference) {
     .star.twinkle { animation: twinkle 3.4s ease-in-out infinite; }
@@ -264,27 +268,25 @@
     height: 96px;
     border-radius: 50%;
     background:
-      radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f1f1 45%, #d9d9d9 100%);
+      radial-gradient(circle at 33% 28%, #ffffff 0%, #fff8fc 55%, #ffe3f2 100%);
     box-shadow:
-      inset -8px -8px 16px rgba(0,0,0,0.18),
-      inset 4px 4px 10px rgba(255,255,255,0.9),
-      0 20px 34px rgba(0,0,0,0.4),
-      0 0 0 1px rgba(217, 182, 74, 0.18);
+      inset -8px -8px 16px rgba(255, 143, 199, 0.16),
+      inset 4px 4px 10px rgba(255,255,255,0.95),
+      0 20px 34px rgba(45, 15, 60, 0.32),
+      0 0 0 1px rgba(255, 143, 199, 0.3);
     position: relative;
     animation: float 3.2s ease-in-out infinite;
   }
 
+  /* a little sparkle instead of the old dimple texture */
   .golf-ball::before {
-    content: "";
+    content: "✦";
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background-image:
-      radial-gradient(circle, rgba(0,0,0,0.12) 1.4px, transparent 1.6px);
-    background-size: 11px 11px;
-    background-position: 0 0;
-    mask-image: radial-gradient(circle at 40% 35%, black 55%, transparent 78%);
-    -webkit-mask-image: radial-gradient(circle at 40% 35%, black 55%, transparent 78%);
+    top: 14px;
+    left: 18px;
+    font-size: 13px;
+    color: #fff;
+    opacity: 0.9;
   }
 
   .golf-ball::after {
@@ -295,9 +297,42 @@
     width: 72px;
     height: 14px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.4);
+    background: rgba(74, 45, 92, 0.35);
     filter: blur(4px);
     animation: shadow 3.2s ease-in-out infinite;
+  }
+
+  /* cute face */
+  .gb-eye {
+    position: absolute;
+    top: 42px;
+    width: 7px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--ink);
+  }
+  .gb-eye-l { left: 29px; }
+  .gb-eye-r { left: 60px; }
+  .gb-blush {
+    position: absolute;
+    top: 54px;
+    width: 13px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 111, 163, 0.5);
+  }
+  .gb-blush-l { left: 16px; }
+  .gb-blush-r { left: 67px; }
+  .gb-mouth {
+    position: absolute;
+    top: 55px;
+    left: 50%;
+    width: 16px;
+    height: 8px;
+    border: 2.5px solid var(--ink);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    transform: translateX(-50%);
   }
 
   @keyframes float {
@@ -353,7 +388,7 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--gold-1);
-    background: rgba(217, 182, 74, 0.12);
+    background: rgba(255, 143, 199, 0.12);
     border: 1px solid var(--glass-border-gold);
     border-radius: 999px;
     backdrop-filter: blur(8px);
@@ -374,8 +409,8 @@
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    box-shadow: 0 14px 30px rgba(201, 162, 39, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 14px 30px rgba(255, 111, 163, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease;
   }
   .start-btn::after {
     content: "";
@@ -388,7 +423,7 @@
   }
   .start-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 36px rgba(201, 162, 39, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 18px 36px rgba(255, 111, 163, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .start-btn:hover::after { left: 130%; }
   .start-btn:active {
@@ -439,7 +474,7 @@
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease;
   }
-  .count-btn:hover { background: rgba(217, 182, 74, 0.14); }
+  .count-btn:hover { background: rgba(255, 143, 199, 0.14); }
   .count-btn:active { transform: scale(0.94); }
   .count-btn:disabled {
     opacity: 0.3;
@@ -486,14 +521,14 @@
     color: var(--ink);
     background: var(--cream);
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: 18px;
     outline: none;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
   }
   .name-input:focus {
     border-color: var(--gold-2);
-    box-shadow: 0 0 0 3px rgba(217, 182, 74, 0.25);
+    box-shadow: 0 0 0 3px rgba(255, 143, 199, 0.25);
   }
 
   .setup-actions {
@@ -510,7 +545,7 @@
     border-radius: 999px;
     border: none;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.15s ease, background 0.15s ease;
   }
   .btn-secondary {
     color: var(--cream);
@@ -527,7 +562,7 @@
     overflow: hidden;
     color: var(--ink);
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    box-shadow: 0 12px 26px rgba(201, 162, 39, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 12px 26px rgba(255, 111, 163, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .btn-primary::after {
     content: "";
@@ -540,7 +575,7 @@
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(201, 162, 39, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow: 0 16px 32px rgba(255, 111, 163, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .btn-primary:hover::after { left: 130%; }
 
@@ -563,7 +598,7 @@
 
   .mode-card {
     border: 1px solid var(--glass-border);
-    border-radius: 18px;
+    border-radius: 26px;
     background: var(--glass);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -573,8 +608,8 @@
   }
   .mode-card.selected {
     border-color: var(--glass-border-gold);
-    background: rgba(217, 182, 74, 0.1);
-    box-shadow: 0 0 0 1px rgba(217, 182, 74, 0.35), var(--shadow);
+    background: rgba(255, 143, 199, 0.1);
+    box-shadow: 0 0 0 1px rgba(255, 143, 199, 0.35), var(--shadow);
   }
 
   .mode-head {
@@ -627,7 +662,7 @@
   .mode-details summary::before {
     content: "▸";
     display: inline-block;
-    transition: transform 0.15s ease;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
   }
   .mode-details[open] summary::before {
     transform: rotate(90deg);
@@ -654,7 +689,7 @@
   .compare-wrap {
     overflow-x: auto;
     margin-bottom: 1.6rem;
-    border-radius: 14px;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
   }
   .compare-table {
@@ -720,7 +755,7 @@
   .draw-card-front {
     position: absolute;
     inset: 0;
-    border-radius: 12px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -748,7 +783,7 @@
     background: var(--glass);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    border-radius: 14px;
+    border-radius: 20px;
     padding: 0.7rem 0.95rem;
     margin-bottom: 0.5rem;
     text-align: left;
@@ -791,7 +826,7 @@
     line-height: 1;
     cursor: pointer;
   }
-  .hole-nav-btn:hover { background: rgba(217, 182, 74, 0.14); }
+  .hole-nav-btn:hover { background: rgba(255, 143, 199, 0.14); }
   .hole-chip-row {
     display: flex;
     gap: 0.4rem;
@@ -803,7 +838,7 @@
     flex: 0 0 auto;
     width: 34px;
     height: 34px;
-    border-radius: 10px;
+    border-radius: 14px;
     border: 1px solid var(--glass-border);
     background: var(--glass);
     color: var(--cream);
@@ -817,7 +852,7 @@
   }
   .hole-chip.active {
     border-color: var(--glass-border-gold);
-    background: rgba(217, 182, 74, 0.16);
+    background: rgba(255, 143, 199, 0.16);
     color: var(--gold-1);
   }
   .hole-chip.filled::after {
@@ -843,7 +878,7 @@
     background: var(--glass);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 22px;
     padding: 0.75rem 0.85rem;
     margin-bottom: 0.6rem;
   }
@@ -920,7 +955,7 @@
   }
   .bet-chip.active {
     border-color: var(--glass-border-gold);
-    background: rgba(217, 182, 74, 0.16);
+    background: rgba(255, 143, 199, 0.16);
     color: var(--gold-1);
   }
 
@@ -939,14 +974,14 @@
     color: var(--ink);
     background: var(--cream);
     border: 1px solid transparent;
-    border-radius: 12px;
+    border-radius: 18px;
     outline: none;
     text-align: right;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
   }
   .bet-custom-input:focus {
     border-color: var(--gold-2);
-    box-shadow: 0 0 0 3px rgba(217, 182, 74, 0.25);
+    box-shadow: 0 0 0 3px rgba(255, 143, 199, 0.25);
   }
   .bet-custom-unit {
     color: var(--cream-dim);
@@ -984,19 +1019,19 @@
     background: var(--glass);
     backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
-    border-radius: 16px;
+    border-radius: 22px;
     padding: 0.65rem 0.9rem;
     margin-bottom: 0.5rem;
   }
   .result-row:first-child {
     border-color: var(--glass-border-gold);
-    background: rgba(217, 182, 74, 0.08);
+    background: rgba(255, 143, 199, 0.08);
   }
   .result-rank {
     flex: 0 0 22px;
     height: 22px;
     border-radius: 50%;
-    background: rgba(217, 182, 74, 0.18);
+    background: rgba(255, 143, 199, 0.18);
     color: var(--gold-1);
     font-size: 0.74rem;
     font-weight: 800;
@@ -1042,7 +1077,13 @@
 
   <div class="stage" id="screen-start">
     <div class="ball-wrap">
-      <div class="golf-ball" id="golfBall" aria-hidden="true"></div>
+      <div class="golf-ball" id="golfBall" aria-hidden="true">
+        <span class="gb-eye gb-eye-l"></span>
+        <span class="gb-eye gb-eye-r"></span>
+        <span class="gb-blush gb-blush-l"></span>
+        <span class="gb-blush gb-blush-r"></span>
+        <span class="gb-mouth"></span>
+      </div>
     </div>
     <h1>Golf Betting <span class="accent">Calculator</span></h1>
     <p class="subtitle">골프 내기 정산, 이제 계산기 하나로 끝내세요</p>
@@ -2387,7 +2428,13 @@
     function weatherFor(lat, lon) {
       var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat +
         '&longitude=' + lon + '&current=weather_code,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
-      return fetchJson(url, 4000);
+      // 한반도 좌표면 Open-Meteo가 제공하는 기상청(KMA) 모델을 우선 사용 —
+      // 그 모델 호출이 실패하면(일시 장애 등) 기본 통합 모델로 대체
+      var inKorea = lat >= 33 && lat <= 39 && lon >= 124 && lon <= 132;
+      if (!inKorea) return fetchJson(url, 4000);
+      return fetchJson(url + '&models=kma_seamless', 4000).catch(function () {
+        return fetchJson(url, 4000);
+      });
     }
 
     // --- 색 보간 유틸 ---
@@ -2396,25 +2443,32 @@
     function rgbStr(c) { return 'rgb(' + Math.round(c[0]) + ',' + Math.round(c[1]) + ',' + Math.round(c[2]) + ')'; }
 
     // 하늘 색 3단계(글로우/중간/외곽) — night는 기존 고정 디자인과 완전히 동일한 값
-    var NIGHT = { glow: [29, 76, 46], mid: [10, 36, 23], edge: [4, 20, 12] };
-    var TWILIGHT = { glow: [168, 104, 64], mid: [54, 34, 26], edge: [10, 16, 11] };
-    var DAY = { glow: [58, 140, 74], mid: [24, 64, 36], edge: [7, 24, 15] };
-    var RAIN_TINT = [58, 74, 86];
-    var SNOW_TINT = [214, 226, 232];
-    var CLOUD_TINT = [70, 78, 80];
+    var NIGHT = { glow: [107, 63, 160], mid: [45, 27, 84], edge: [26, 16, 51] };
+    var TWILIGHT = { glow: [255, 145, 190], mid: [120, 55, 110], edge: [45, 22, 58] };
+    var DAY = { glow: [150, 200, 255], mid: [80, 115, 195], edge: [35, 45, 95] };
+    var RAIN_TINT = [90, 105, 160];
+    var SNOW_TINT = [235, 238, 252];
+    var CLOUD_TINT = [130, 115, 155];
 
     // now/sunrise/sunset(분 단위, 자정 기준)과 날씨로 하늘 전체(배경, 해/달 위치·색,
     // 별) 상태를 계산해 적용한다. weatherInfo가 없으면(폴백) 맑음으로 취급.
     function renderSkyState(nowMin, sunriseMin, sunsetMin, weatherInfo) {
       var altitude; // -1(자정) ~ 0(일출/일몰) ~ +1(정오)
+      // arcFrac: 뜨는 순간 0(동쪽) → 지는 순간 1(서쪽), 낮/밤 각각 자기 구간
+      // 안에서 0→1로 진행 — 해/달의 좌우 위치를 여기서 그대로 재사용한다
+      // (예전엔 하루 24시간 전체를 0~100%로 매핑해서, 예를 들어 일몰이
+      // 19시 30분인 여름날 오후 5시에도 아직 화면 왼쪽 절반에 머물러
+      // "아직 동쪽에 있다"는 위화감이 있었음 — 뜨고 지는 구간 자체를
+      // 기준으로 삼아 고쳤다)
+      var arcFrac;
       if (nowMin >= sunriseMin && nowMin < sunsetMin) {
-        var f = (nowMin - sunriseMin) / (sunsetMin - sunriseMin);
-        altitude = Math.sin(Math.PI * f);
+        arcFrac = (nowMin - sunriseMin) / (sunsetMin - sunriseMin);
+        altitude = Math.sin(Math.PI * arcFrac);
       } else {
         var nightLen = (1440 - sunsetMin) + sunriseMin;
         var t = nowMin >= sunsetMin ? (nowMin - sunsetMin) : (nowMin + 1440 - sunsetMin);
-        var f2 = nightLen > 0 ? (t / nightLen) : 0;
-        altitude = -Math.sin(Math.PI * f2);
+        arcFrac = nightLen > 0 ? (t / nightLen) : 0;
+        altitude = -Math.sin(Math.PI * arcFrac);
       }
       var dayW = Math.max(0, altitude);
       var nightW = Math.max(0, -altitude);
@@ -2443,9 +2497,9 @@
       root.setProperty('--sky-edge', rgbStr(edge));
       root.setProperty('--night-amount', String(nightW));
 
-      // 해/달: 하루 동안 동(0%)→서(100%)로 이동, 뜨고 질 때는 지평선 가까이,
-      // 정오/자정에는 하늘 높이 — 실제 궤적처럼 포물선으로 오르내리게 함
-      var sunX = (nowMin / 1440) * 100;
+      // 해/달: 뜨는 순간 화면 왼쪽(동)→지는 순간 오른쪽(서)으로 이동, 뜨고
+      // 질 때는 지평선 가까이, 정오/자정에는 하늘 높이 — 포물선으로 오르내림
+      var sunX = arcFrac * 100;
       var mag = Math.max(dayW, nightW);
       var sunY = 58 - mag * 50;
       root.setProperty('--sun-x', sunX + '%');
@@ -2455,12 +2509,12 @@
       celestial.classList.toggle('is-moon', !isDayNow);
       if (isDayNow) {
         var warmth = 1 - dayW; // 지평선 근처일수록 붉고 따뜻하게, 정오엔 하얗게
-        var sunColor = lerpColor([255, 244, 214], [255, 190, 110], warmth);
+        var sunColor = lerpColor([255, 244, 180], [255, 170, 130], warmth);
         celestial.style.setProperty('--body-color', rgbStr(sunColor));
         celestial.style.setProperty('--body-halo', 'rgba(' + Math.round(sunColor[0]) + ',' + Math.round(sunColor[1]) + ',' + Math.round(sunColor[2]) + ',' + (0.45 - warmth * 0.1) + ')');
       } else {
-        celestial.style.setProperty('--body-color', '#e7ecf7');
-        celestial.style.setProperty('--body-halo', 'rgba(210,220,245,0.28)');
+        celestial.style.setProperty('--body-color', '#ffe3f2');
+        celestial.style.setProperty('--body-halo', 'rgba(255, 200, 230, 0.32)');
       }
       var dimmed = !!(weatherInfo && (weatherInfo.precip || weatherInfo.cloudy));
       celestial.style.setProperty('--body-opacity', dimmed ? '0.35' : '1');
