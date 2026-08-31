@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Golf Betting Calculator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   /* registering these as typed custom properties lets the browser animate
      them directly — the sky can visibly drift instead of jump-cutting each
@@ -35,9 +32,9 @@
     --glass-strong: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(246, 241, 228, 0.14);
     --glass-border-gold: rgba(217, 182, 74, 0.5);
-    --shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
-    --font-display: 'Fraunces', Georgia, serif;
-    --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+    --shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 
     /* live sky state — the weather script recomputes these every few
        minutes from real sunrise/sunset + conditions; defaults below
@@ -337,15 +334,15 @@
   h1 {
     font-family: var(--font-display);
     font-size: clamp(2.15rem, 6vw, 3.6rem);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    line-height: 1.08;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.06;
     color: var(--cream);
+    text-wrap: balance;
     text-shadow: 0 2px 20px rgba(0,0,0,0.4);
   }
 
   h1 .accent {
-    font-style: italic;
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
     -webkit-background-clip: text;
     background-clip: text;
@@ -376,43 +373,32 @@
 
   .start-btn {
     display: inline-block;
-    position: relative;
-    overflow: hidden;
     margin-top: 2.25rem;
     padding: 0.9rem 2.7rem;
     font-family: var(--font-body);
     font-size: 1.02rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     color: var(--ink);
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
     border: none;
     border-radius: 999px;
     cursor: pointer;
-    box-shadow: 0 14px 30px rgba(201, 162, 39, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .start-btn::after {
-    content: "";
-    position: absolute;
-    top: 0; left: -60%;
-    width: 40%; height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.6s ease;
+    box-shadow: 0 10px 24px rgba(201, 162, 39, 0.28), inset 0 1px 0 rgba(255,255,255,0.5);
+    transition: transform 0.2s cubic-bezier(.2,.9,.3,1), filter 0.2s ease, box-shadow 0.2s ease;
   }
   .start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 18px 36px rgba(201, 162, 39, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    filter: brightness(1.06);
   }
-  .start-btn:hover::after { left: 130%; }
   .start-btn:active {
-    transform: translateY(0);
+    transform: scale(0.96);
+    filter: brightness(0.97);
   }
   .start-btn:disabled {
-    opacity: 0.55;
+    opacity: 0.5;
     cursor: default;
     transform: none;
+    filter: none;
   }
 
   /* --- setup screen --- */
@@ -424,8 +410,10 @@
   #screen-result h2 {
     font-family: var(--font-display);
     font-size: clamp(1.55rem, 4.4vw, 2.15rem);
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--cream);
+    text-wrap: balance;
     text-shadow: 0 2px 16px rgba(0,0,0,0.35);
   }
   #screen-setup .subtitle {
@@ -521,11 +509,11 @@
     padding: 0.78rem 1.85rem;
     font-family: var(--font-body);
     font-size: 0.92rem;
-    font-weight: 700;
+    font-weight: 600;
     border-radius: 999px;
     border: none;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    transition: transform 0.2s cubic-bezier(.2,.9,.3,1), filter 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   }
   .btn-secondary {
     color: var(--cream);
@@ -537,27 +525,21 @@
     background: var(--glass-strong);
     border-color: var(--glass-border-gold);
   }
+  .btn-secondary:active,
+  .btn-primary:active {
+    transform: scale(0.96);
+  }
   .btn-primary {
-    position: relative;
-    overflow: hidden;
     color: var(--ink);
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    box-shadow: 0 12px 26px rgba(201, 162, 39, 0.35), inset 0 1px 0 rgba(255,255,255,0.5);
-  }
-  .btn-primary::after {
-    content: "";
-    position: absolute;
-    top: 0; left: -60%;
-    width: 40%; height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.6s ease;
+    box-shadow: 0 8px 20px rgba(201, 162, 39, 0.28), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(201, 162, 39, 0.45), inset 0 1px 0 rgba(255,255,255,0.5);
+    filter: brightness(1.06);
   }
-  .btn-primary:hover::after { left: 130%; }
+  .btn-primary:active {
+    filter: brightness(0.97);
+  }
 
   /* --- mode selection screen --- */
   #screen-mode .subtitle {
@@ -985,6 +967,71 @@
     margin-bottom: 1.6rem;
   }
 
+  /* podium for the top finishers — 2nd/1st/3rd left to right, tallest in
+     the middle, medal + name + net settlement above each pillar */
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+  .podium-place {
+    flex: 1 1 0;
+    max-width: 132px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .podium-place.rank-1 { order: 2; }
+  .podium-place.rank-2 { order: 1; }
+  .podium-place.rank-3 { order: 3; }
+  .podium-medal { font-size: 1.55rem; line-height: 1; margin-bottom: 0.3rem; }
+  .podium-suit { font-size: 0.85rem; margin-bottom: 0.15rem; }
+  .podium-name {
+    font-weight: 700;
+    font-size: 0.86rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 0.15rem;
+  }
+  .podium-amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.98rem;
+    margin-bottom: 0.65rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .podium-amount.positive { color: var(--gold-1); }
+  .podium-amount.negative { color: var(--ruby); }
+  .podium-amount.even { color: rgba(246, 241, 228, 0.55); }
+  .podium-block {
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-bottom: none;
+    display: flex;
+    justify-content: center;
+    padding-top: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--cream-dim);
+  }
+  .podium-place.rank-1 .podium-block {
+    height: 92px;
+    background: rgba(217, 182, 74, 0.16);
+    border-color: var(--glass-border-gold);
+    color: var(--gold-1);
+  }
+  .podium-place.rank-2 .podium-block { height: 66px; }
+  .podium-place.rank-3 .podium-block { height: 50px; }
+
   .result-list {
     text-align: left;
     max-height: 42vh;
@@ -1002,10 +1049,6 @@
     border-radius: 16px;
     padding: 0.65rem 0.9rem;
     margin-bottom: 0.5rem;
-  }
-  .result-row:first-child {
-    border-color: var(--glass-border-gold);
-    background: rgba(217, 182, 74, 0.08);
   }
   .result-rank {
     flex: 0 0 22px;
@@ -1275,6 +1318,7 @@
     <h2>정산 결과</h2>
     <p class="subtitle" id="resultSubtitle"></p>
 
+    <div class="podium" id="resultPodium"></div>
     <div class="result-list" id="resultList"></div>
 
     <details class="mode-details" id="resultDetails">
@@ -1328,6 +1372,7 @@
     var scoreNextBtn = document.getElementById('scoreNextBtn');
     var screenResult = document.getElementById('screen-result');
     var resultSubtitle = document.getElementById('resultSubtitle');
+    var resultPodium = document.getElementById('resultPodium');
     var resultList = document.getElementById('resultList');
     var resultDetails = document.getElementById('resultDetails');
     var resultDetailBody = document.getElementById('resultDetailBody');
@@ -1474,11 +1519,13 @@
       flySrc.stop(flyStart + flyDur);
     }
 
-    // Synthesize the sound of a ball dropping into the cup — modeled after how
-    // golfers actually describe it (hollow rattle against the cup wall/liner,
-    // a bright plastic "plunk/knock", the ball settling at the bottom) rather
-    // than a pure bell tone, with a touch of bright shimmer to keep it cheerful.
-    // Web Audio API only — no external audio file needed.
+    // Synthesize the classic "땡그랑" — a small bright bell/chime, the sound
+    // people actually associate with a ball dropping cleanly into the cup.
+    // A quick metallic strike transient ("땡") followed by a second, softer
+    // ring a beat later ("그랑"), each built as a real bell tone: a
+    // fundamental plus two *inharmonic* partials (bells don't ring in clean
+    // integer harmonics like a flute does — that slight mismatch is exactly
+    // what reads as "bell" instead of "beep"). Web Audio API only.
     function playHoleSound() {
       var Ctx = window.AudioContext || window.webkitAudioContext;
       if (!Ctx) return;
@@ -1487,63 +1534,46 @@
       var ctx = audioCtx;
       var now = ctx.currentTime;
 
-      function noiseKnock(time, freq, q, dur, peak) {
-        var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
-        var d = buf.getChannelData(0);
-        for (var i = 0; i < d.length; i++) {
-          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.6);
-        }
-        var src = ctx.createBufferSource();
-        src.buffer = buf;
-        var filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = freq;
-        filter.Q.value = q;
-        var gain = ctx.createGain();
-        gain.gain.setValueAtTime(peak, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + dur);
-        src.connect(filter).connect(gain).connect(ctx.destination);
-        src.start(time);
-        src.stop(time + dur);
+      function bell(time, freq, peak, dur) {
+        var partials = [1, 2.76, 5.4];
+        var mix = [1, 0.35, 0.14];
+        partials.forEach(function (ratio, i) {
+          var osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = freq * ratio;
+          var gain = ctx.createGain();
+          var peakLevel = peak * mix[i];
+          gain.gain.setValueAtTime(0.0001, time);
+          gain.gain.linearRampToValueAtTime(peakLevel, time + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+          osc.connect(gain).connect(ctx.destination);
+          osc.start(time);
+          osc.stop(time + dur + 0.05);
+        });
       }
 
-      // 1) Bright plastic "plunk" — the ball first hitting the cup
-      noiseKnock(now, 2600, 3, 0.05, 0.75);
+      // the strike itself — a very short bright metallic click
+      var clickBuf = ctx.createBuffer(1, ctx.sampleRate * 0.02, ctx.sampleRate);
+      var cd = clickBuf.getChannelData(0);
+      for (var i = 0; i < cd.length; i++) {
+        cd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / cd.length, 2);
+      }
+      var clickSrc = ctx.createBufferSource();
+      clickSrc.buffer = clickBuf;
+      var clickFilter = ctx.createBiquadFilter();
+      clickFilter.type = 'highpass';
+      clickFilter.frequency.value = 4000;
+      var clickGain = ctx.createGain();
+      clickGain.gain.setValueAtTime(0.5, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      clickSrc.connect(clickFilter).connect(clickGain).connect(ctx.destination);
+      clickSrc.start(now);
+      clickSrc.stop(now + 0.02);
 
-      // 2) A thin metallic shimmer layered on the plunk for a cheerful edge
-      var shimmer = ctx.createOscillator();
-      shimmer.type = 'sine';
-      shimmer.frequency.value = 2400;
-      var shimmerGain = ctx.createGain();
-      shimmerGain.gain.setValueAtTime(0.0001, now);
-      shimmerGain.gain.linearRampToValueAtTime(0.18, now + 0.006);
-      shimmerGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-      shimmer.connect(shimmerGain).connect(ctx.destination);
-      shimmer.start(now);
-      shimmer.stop(now + 0.15);
-
-      // 3) Hollow rattle — the ball bouncing against the cup wall/flagstick,
-      // a handful of quick decaying bounces, ringing slightly like plastic/metal
-      var rattleTimes = [0.045, 0.1, 0.15, 0.195, 0.235];
-      var rattleFreqs = [2000, 1600, 1300, 1050, 850];
-      rattleTimes.forEach(function (t, idx) {
-        noiseKnock(now + t, rattleFreqs[idx], 5, 0.05, 0.32 * (1 - idx * 0.14));
-      });
-
-      // 4) Settle — a short, moderate (not too low) resonant thunk as the ball
-      // comes to rest at the bottom of the cup
-      var settleStart = now + 0.27;
-      var settleOsc = ctx.createOscillator();
-      settleOsc.type = 'triangle';
-      settleOsc.frequency.setValueAtTime(340, settleStart);
-      settleOsc.frequency.exponentialRampToValueAtTime(220, settleStart + 0.12);
-      var settleGain = ctx.createGain();
-      settleGain.gain.setValueAtTime(0.0001, settleStart);
-      settleGain.gain.linearRampToValueAtTime(0.3, settleStart + 0.012);
-      settleGain.gain.exponentialRampToValueAtTime(0.0001, settleStart + 0.16);
-      settleOsc.connect(settleGain).connect(ctx.destination);
-      settleOsc.start(settleStart);
-      settleOsc.stop(settleStart + 0.17);
+      // 땡 — the bright first strike, 그랑 — a slightly higher, softer
+      // ring right after, overlapping its decay (a cheerful rising third)
+      bell(now, 1568, 0.5, 0.55);        // G6
+      bell(now + 0.09, 1976, 0.32, 0.5); // B6
     }
 
     function renderNameInputs() {
@@ -2004,14 +2034,58 @@
       }
       players.sort(function (a, b) { return b.net - a.net; });
 
+      var PODIUM_MEDALS = ['🥇', '🥈', '🥉'];
+      var podiumCount = Math.min(3, players.length);
+
+      resultPodium.innerHTML = '';
+      for (var pi = 0; pi < podiumCount; pi++) {
+        var pl0 = players[pi];
+        var rank0 = pi + 1;
+        var netClass0 = pl0.net > 0 ? 'positive' : (pl0.net < 0 ? 'negative' : 'even');
+
+        var place = document.createElement('div');
+        place.className = 'podium-place rank-' + rank0;
+
+        var medal = document.createElement('span');
+        medal.className = 'podium-medal';
+        medal.textContent = PODIUM_MEDALS[pi];
+        place.appendChild(medal);
+
+        if (selectedMode === 'draw' && playerSuit[pl0.idx]) {
+          var suit0 = document.createElement('span');
+          suit0.className = 'podium-suit';
+          suit0.textContent = playerSuit[pl0.idx];
+          suit0.style.color = suitColor(playerSuit[pl0.idx]);
+          place.appendChild(suit0);
+        }
+
+        var pname = document.createElement('span');
+        pname.className = 'podium-name';
+        pname.textContent = pl0.name;
+        place.appendChild(pname);
+
+        var pamount = document.createElement('span');
+        pamount.className = 'podium-amount ' + netClass0;
+        pamount.textContent = (pl0.net > 0 ? '+' : '') + formatWon(pl0.net);
+        place.appendChild(pamount);
+
+        var block = document.createElement('div');
+        block.className = 'podium-block';
+        block.textContent = rank0;
+        place.appendChild(block);
+
+        resultPodium.appendChild(place);
+      }
+
       resultList.innerHTML = '';
-      players.forEach(function (pl, rank) {
+      players.slice(podiumCount).forEach(function (pl, i) {
+        var rank = podiumCount + i + 1;
         var row = document.createElement('div');
         row.className = 'result-row';
 
         var rankSpan = document.createElement('span');
         rankSpan.className = 'result-rank';
-        rankSpan.textContent = rank + 1;
+        rankSpan.textContent = rank;
         row.appendChild(rankSpan);
 
         if (selectedMode === 'draw' && playerSuit[pl.idx]) {
