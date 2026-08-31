@@ -197,6 +197,14 @@
     100% { transform: translate(-8px, 120vh); }
   }
 
+  /* victory confetti + fireworks burst, drawn on the result screen only */
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+  }
+
   /* compact current-conditions readout — the sky itself now shows time/
      position, so this only needs to name the place and the weather */
   .sky-widget {
@@ -1092,6 +1100,7 @@
   <div class="celestial" id="celestial" aria-hidden="true"></div>
   <div class="star-field" id="starField" aria-hidden="true"></div>
   <div class="weather-fx" id="weatherFx" hidden></div>
+  <canvas id="confettiCanvas" aria-hidden="true" hidden></canvas>
 
   <div class="sky-widget" id="skyWidget" aria-hidden="true">
     <span class="sky-icon" id="skyIcon">🕒</span>
@@ -1378,6 +1387,7 @@
     var resultDetailBody = document.getElementById('resultDetailBody');
     var resultBackBtn = document.getElementById('resultBackBtn');
     var resultRestartBtn = document.getElementById('resultRestartBtn');
+    var confettiCanvas = document.getElementById('confettiCanvas');
 
     var MIN_PLAYERS = 2;
     var MAX_PLAYERS = 8;
@@ -1422,6 +1432,8 @@
     };
     var betAmount = 1000;
     var audioCtx = null;
+    var holeSound = new Audio('sounds/hole-in.wav');
+    holeSound.preload = 'auto';
 
     function formatWon(n) {
       return Math.round(n).toLocaleString('ko-KR') + '원';
@@ -1519,61 +1531,14 @@
       flySrc.stop(flyStart + flyDur);
     }
 
-    // Synthesize the classic "땡그랑" — a small bright bell/chime, the sound
-    // people actually associate with a ball dropping cleanly into the cup.
-    // A quick metallic strike transient ("땡") followed by a second, softer
-    // ring a beat later ("그랑"), each built as a real bell tone: a
-    // fundamental plus two *inharmonic* partials (bells don't ring in clean
-    // integer harmonics like a flute does — that slight mismatch is exactly
-    // what reads as "bell" instead of "beep"). Web Audio API only.
+    // A real recorded "hole complete" chime (not synthesized) — see
+    // sounds/CREDITS.md for its source and license (Kenney.nl, CC0).
     function playHoleSound() {
-      var Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      if (!audioCtx) audioCtx = new Ctx();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      var ctx = audioCtx;
-      var now = ctx.currentTime;
-
-      function bell(time, freq, peak, dur) {
-        var partials = [1, 2.76, 5.4];
-        var mix = [1, 0.35, 0.14];
-        partials.forEach(function (ratio, i) {
-          var osc = ctx.createOscillator();
-          osc.type = 'sine';
-          osc.frequency.value = freq * ratio;
-          var gain = ctx.createGain();
-          var peakLevel = peak * mix[i];
-          gain.gain.setValueAtTime(0.0001, time);
-          gain.gain.linearRampToValueAtTime(peakLevel, time + 0.008);
-          gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-          osc.connect(gain).connect(ctx.destination);
-          osc.start(time);
-          osc.stop(time + dur + 0.05);
-        });
-      }
-
-      // the strike itself — a very short bright metallic click
-      var clickBuf = ctx.createBuffer(1, ctx.sampleRate * 0.02, ctx.sampleRate);
-      var cd = clickBuf.getChannelData(0);
-      for (var i = 0; i < cd.length; i++) {
-        cd[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / cd.length, 2);
-      }
-      var clickSrc = ctx.createBufferSource();
-      clickSrc.buffer = clickBuf;
-      var clickFilter = ctx.createBiquadFilter();
-      clickFilter.type = 'highpass';
-      clickFilter.frequency.value = 4000;
-      var clickGain = ctx.createGain();
-      clickGain.gain.setValueAtTime(0.5, now);
-      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-      clickSrc.connect(clickFilter).connect(clickGain).connect(ctx.destination);
-      clickSrc.start(now);
-      clickSrc.stop(now + 0.02);
-
-      // 땡 — the bright first strike, 그랑 — a slightly higher, softer
-      // ring right after, overlapping its decay (a cheerful rising third)
-      bell(now, 1568, 0.5, 0.55);        // G6
-      bell(now + 0.09, 1976, 0.32, 0.5); // B6
+      try {
+        holeSound.currentTime = 0;
+        var p = holeSound.play();
+        if (p && typeof p.catch === 'function') p.catch(function () { /* playback blocked, stay silent */ });
+      } catch (e) { /* audio not available, continue silently */ }
     }
 
     function renderNameInputs() {
@@ -2014,6 +1979,109 @@
       resultDetailBody.innerHTML = html;
     }
 
+    // ---- victory celebration: confetti + a couple of firework bursts ----
+
+    var confettiCtx = confettiCanvas.getContext && confettiCanvas.getContext('2d');
+    var confettiParticles = [];
+    var confettiRunning = false;
+    var confettiStopTimer = null;
+    var CONFETTI_COLORS = ['#f3da8e', '#d9b64a', '#c89b2c', '#f6f1e4', '#e2685c'];
+    var prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function stepConfetti() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(function (p) {
+        if (p.type === 'confetti') {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          confettiCtx.save();
+          confettiCtx.translate(p.x, p.y);
+          confettiCtx.rotate(p.rot);
+          confettiCtx.fillStyle = p.color;
+          confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          confettiCtx.restore();
+        } else {
+          p.life++;
+          p.vy += 0.05;
+          p.x += p.vx;
+          p.y += p.vy;
+          confettiCtx.globalAlpha = Math.max(0, 1 - p.life / p.maxLife);
+          confettiCtx.fillStyle = p.color;
+          confettiCtx.beginPath();
+          confettiCtx.arc(p.x, p.y, 2.4, 0, Math.PI * 2);
+          confettiCtx.fill();
+          confettiCtx.globalAlpha = 1;
+        }
+      });
+      if (confettiRunning) requestAnimationFrame(stepConfetti);
+    }
+
+    function fireworkBurst() {
+      var cx = confettiCanvas.width * (0.25 + Math.random() * 0.5);
+      var cy = confettiCanvas.height * (0.2 + Math.random() * 0.25);
+      var color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+      for (var j = 0; j < 46; j++) {
+        var angle = (Math.PI * 2 * j) / 46;
+        var speed = 2.5 + Math.random() * 2.5;
+        confettiParticles.push({
+          type: 'spark',
+          x: cx, y: cy,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: color,
+          life: 0,
+          maxLife: 45 + Math.random() * 20
+        });
+      }
+    }
+
+    function launchCelebration() {
+      if (!confettiCtx || prefersReducedMotion) return;
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      confettiCanvas.hidden = false;
+      confettiParticles = [];
+
+      for (var i = 0; i < 140; i++) {
+        confettiParticles.push({
+          type: 'confetti',
+          x: Math.random() * confettiCanvas.width,
+          y: -20 - Math.random() * confettiCanvas.height * 0.5,
+          w: 6 + Math.random() * 5,
+          h: 9 + Math.random() * 6,
+          color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+          vy: 2 + Math.random() * 2.5,
+          vx: (Math.random() - 0.5) * 2,
+          rot: Math.random() * Math.PI * 2,
+          vr: (Math.random() - 0.5) * 0.2
+        });
+      }
+
+      for (var b = 0; b < 3; b++) {
+        setTimeout(fireworkBurst, b * 260);
+      }
+
+      if (!confettiRunning) {
+        confettiRunning = true;
+        requestAnimationFrame(stepConfetti);
+      }
+
+      clearTimeout(confettiStopTimer);
+      confettiStopTimer = setTimeout(function () {
+        confettiRunning = false;
+        confettiCanvas.hidden = true;
+        confettiParticles = [];
+      }, 3600);
+    }
+
+    window.addEventListener('resize', function () {
+      if (!confettiCanvas.hidden) {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      }
+    });
+
     function renderResultScreen() {
       var settlement;
       if (selectedMode === 'stroke') settlement = computeStrokeSettlement();
@@ -2117,6 +2185,7 @@
 
       resultDetails.removeAttribute('open');
       renderResultDetail(settlement);
+      launchCelebration();
     }
 
     function finishScoring() {
@@ -2138,6 +2207,11 @@
 
       ball.classList.remove('hit');
       startBtn.disabled = false;
+
+      clearTimeout(confettiStopTimer);
+      confettiRunning = false;
+      confettiParticles = [];
+      confettiCanvas.hidden = true;
 
       [screenSetup, screenMode, screenBet, screenDraw, screenScore, screenResult].forEach(function (s) {
         s.hidden = true;
