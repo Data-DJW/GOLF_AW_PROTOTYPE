@@ -76,22 +76,35 @@
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 0;
     background:
       radial-gradient(circle at var(--sun-x) var(--sun-y), rgba(255, 255, 255, var(--grass-glint, 0.1)) 0%, transparent 40%),
-      repeating-linear-gradient(112deg,
-        rgba(255, 255, 255, 0.055) 0px, rgba(255, 255, 255, 0.055) 1px,
-        transparent 1px, transparent 6px),
-      repeating-linear-gradient(68deg,
-        rgba(0, 0, 0, 0.05) 0px, rgba(0, 0, 0, 0.05) 1px,
-        transparent 1px, transparent 5px),
       /* long mower-stripe bands, alternating slightly lighter/darker */
       repeating-linear-gradient(100deg,
-        rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 46px,
+        rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 46px,
         transparent 46px, transparent 92px
       );
     filter: saturate(var(--grass-saturation, 1)) brightness(var(--grass-brightness, 1));
     transition: filter 1.8s ease;
     pointer-events: none;
+  }
+
+  /* real-blade turf texture: procedurally lit turbulence (see the <filter
+     id="turfBlades"> defs at the top of <body>) standing in for a photo of
+     mown grass — feDiffuseLighting bump-shades the noise as if it were a
+     field of individual blades, lit from the same --sun-x/--sun-y the real
+     sun/moon uses, so the "grain" of the turf visibly catches light from
+     the correct direction through the day. soft-light keeps it a wash over
+     the green rather than an opaque layer. */
+  .turf-blades {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.62;
+    mix-blend-mode: soft-light;
+    filter: url(#turfBlades) saturate(var(--grass-saturation, 1)) brightness(var(--grass-brightness, 1));
+    transition: filter 1.8s ease, opacity 1.8s ease;
   }
 
   /* subtle grain for a tactile, premium finish */
@@ -329,14 +342,61 @@
     50% { transform: scale(0.72); opacity: 0.18; }
   }
 
-  /* ball gets struck and flies off screen */
+  /* ball gets struck and flies off screen along a real drive-shot arc:
+     a curved offset-path carries it up and away (instead of a straight
+     diagonal), while its own dimple layer spins independently for a
+     believable backspin, and a JS-spawned trail of fading "ghost" balls
+     plus a divot puff at impact (below) sell the sense of real speed. */
   .golf-ball.hit {
-    animation: hitFly 0.75s cubic-bezier(.32,.67,.4,1) forwards;
+    animation: hitFly 1s ease-in forwards;
+    offset-path: path("M 0 0 C 40 -10, 90 -30, 160 -90 C 230 -160, 320 -280, 420 -420 C 500 -540, 580 -650, 680 -760");
+    offset-rotate: 0deg;
   }
   @keyframes hitFly {
-    0% { transform: translate(0,0) scale(1) rotate(0deg); }
-    12% { transform: translate(-6px, 4px) scale(0.94, 1.06) rotate(-8deg); }
-    100% { transform: translate(760px, -560px) scale(0.1) rotate(640deg); opacity: 0; }
+    0% { offset-distance: 0%; transform: scale(1, 1); opacity: 1; }
+    7% { transform: scale(1.08, 0.86); }
+    18% { transform: scale(0.92, 1.04); }
+    65% { transform: scale(0.68, 0.68); opacity: 1; }
+    100% { offset-distance: 100%; transform: scale(0.05, 0.05); opacity: 0; }
+  }
+  .golf-ball.hit::before {
+    animation: ballSpin 0.28s linear infinite;
+  }
+  @keyframes ballSpin {
+    to { transform: rotate(-360deg); }
+  }
+
+  /* fading afterimage spawned along the ball's live position while it
+     flies — cheap motion-blur trail, see spawnBallGhost() */
+  .ball-ghost {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.6), rgba(255,255,255,0) 72%);
+    pointer-events: none;
+    z-index: 5;
+    animation: ghostFade 0.42s ease-out forwards;
+  }
+  @keyframes ghostFade {
+    from { opacity: 0.55; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.7); }
+  }
+
+  /* a small puff of turf dust kicked up right at the moment of impact */
+  .divot-puff {
+    position: fixed;
+    width: 64px;
+    height: 20px;
+    margin-left: -32px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(214, 190, 120, 0.55), rgba(140, 110, 60, 0) 72%);
+    pointer-events: none;
+    z-index: 4;
+    animation: divotBurst 0.5s ease-out forwards;
+  }
+  @keyframes divotBurst {
+    from { opacity: 0.85; transform: scale(0.4); }
+    to { opacity: 0; transform: scale(1.7); }
   }
 
   h1 {
@@ -466,6 +526,44 @@
   .count-label {
     font-size: 0.9rem;
     color: var(--cream-dim);
+  }
+
+  .hole-count-control {
+    margin-bottom: 1.9rem;
+  }
+  .hole-count-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    margin-bottom: 0.55rem;
+  }
+  .hole-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+  }
+  .hole-toggle-btn {
+    padding: 0.6rem 1.6rem;
+    font-family: var(--font-body);
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    color: var(--cream-dim);
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  }
+  .hole-toggle-btn:hover { background: var(--glass-strong); }
+  .hole-toggle-btn:active { transform: scale(0.96); }
+  .hole-toggle-btn.active {
+    border-color: var(--glass-border-gold);
+    background: rgba(217, 182, 74, 0.16);
+    color: var(--gold-1);
+    box-shadow: 0 0 0 1px rgba(217, 182, 74, 0.3);
   }
 
   .name-list {
@@ -1093,14 +1191,294 @@
 
   #resultDetails { margin-bottom: 1.6rem; text-align: left; }
 
+  /* --- putting-green loading screen (between wizard steps) --- */
+  .putt-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 50% 42%, rgba(29, 76, 46, 0.88), rgba(4, 20, 12, 0.94));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.26s ease;
+  }
+  .putt-loader.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .putt-stage {
+    position: relative;
+    width: min(84vw, 320px);
+    height: 176px;
+  }
+
+  .putt-ground {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(246, 241, 228, 0), rgba(246, 241, 228, 0.22) 14%, rgba(246, 241, 228, 0.22) 88%, rgba(246, 241, 228, 0));
+  }
+
+  .putt-golfer {
+    position: absolute;
+    left: 0;
+    bottom: 40px;
+    width: 60px;
+    height: 128px;
+  }
+  .golfer-leg {
+    position: absolute;
+    bottom: 0;
+    width: 9px;
+    height: 42px;
+    border-radius: 5px;
+    background: #17130f;
+  }
+  .golfer-leg.back { left: 16px; transform: rotate(-8deg); }
+  .golfer-leg.front { left: 30px; transform: rotate(9deg); }
+  .golfer-torso {
+    position: absolute;
+    bottom: 36px;
+    left: 12px;
+    width: 32px;
+    height: 44px;
+    border-radius: 15px 15px 9px 9px;
+    background: linear-gradient(160deg, #e2685c, #b6392f);
+    box-shadow: inset -5px -5px 9px rgba(0, 0, 0, 0.25);
+    transform: rotate(16deg);
+    transform-origin: bottom center;
+  }
+  .golfer-head {
+    position: absolute;
+    bottom: 74px;
+    left: 19px;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background: #e7b78c;
+    transform: rotate(16deg);
+    transform-origin: bottom center;
+  }
+  .golfer-cap {
+    position: absolute;
+    bottom: 89px;
+    left: 15px;
+    width: 25px;
+    height: 13px;
+    border-radius: 12px 12px 2px 2px;
+    background: #f6f1e4;
+    transform: rotate(16deg);
+    transform-origin: bottom center;
+  }
+  .golfer-cap::after {
+    content: "";
+    position: absolute;
+    bottom: 1px;
+    left: 13px;
+    width: 13px;
+    height: 5px;
+    border-radius: 0 0 8px 2px;
+    background: #f6f1e4;
+  }
+  .golfer-arm {
+    position: absolute;
+    bottom: 58px;
+    left: 27px;
+    width: 5px;
+    height: 38px;
+    border-radius: 3px;
+    background: #d8543f;
+    transform: rotate(16deg);
+    transform-origin: top center;
+    animation: puttSwing 0.9s cubic-bezier(.4, 0, .2, 1) 1;
+  }
+  .golfer-club {
+    position: absolute;
+    bottom: -44px;
+    left: -1px;
+    width: 3px;
+    height: 48px;
+    border-radius: 2px;
+    background: linear-gradient(#d7dee3, #8f98a1);
+  }
+  .golfer-club::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: -4px;
+    width: 11px;
+    height: 7px;
+    border-radius: 3px;
+    background: #3a3f44;
+  }
+  @keyframes puttSwing {
+    0% { transform: rotate(16deg); }
+    32% { transform: rotate(-20deg); }
+    55% { transform: rotate(8deg); }
+    100% { transform: rotate(8deg); }
+  }
+
+  .putt-track {
+    position: absolute;
+    left: 68px;
+    right: 8px;
+    bottom: 40px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(246, 241, 228, 0.14);
+  }
+  .putt-track-fill {
+    position: absolute;
+    inset: 0;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gold-2), var(--gold-1));
+    box-shadow: 0 0 10px rgba(217, 182, 74, 0.5);
+    animation: puttFillGrow 1.05s cubic-bezier(.3, .7, .4, 1) 0.48s forwards;
+  }
+  .putt-ball {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    width: 13px;
+    height: 13px;
+    margin-top: -6.5px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, #d9d9d9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    animation: puttBallRoll 1.05s cubic-bezier(.3, .7, .4, 1) 0.48s forwards;
+  }
+  @keyframes puttFillGrow {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+  @keyframes puttBallRoll {
+    0% { left: 0%; transform: translateX(0) rotate(0deg); opacity: 1; }
+    92% { left: 100%; transform: translateX(-100%) rotate(640deg); opacity: 1; }
+    100% { left: 100%; transform: translateX(-100%) rotate(660deg) scale(0.35); opacity: 0; }
+  }
+
+  .putt-flag {
+    position: absolute;
+    right: -3px;
+    bottom: 0;
+    width: 3px;
+    height: 52px;
+  }
+  .flag-pole {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    height: 52px;
+    background: rgba(246, 241, 228, 0.6);
+  }
+  .flag-cloth {
+    position: absolute;
+    top: 0;
+    left: 2px;
+    width: 15px;
+    height: 10px;
+    background: var(--ruby);
+    clip-path: polygon(0 0, 100% 26%, 0 52%);
+  }
+  .flag-cup {
+    position: absolute;
+    bottom: -4px;
+    left: -7px;
+    width: 15px;
+    height: 5px;
+    border-radius: 50%;
+    background: #04140c;
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .putt-loader-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--gold-1);
+  }
+  .putt-loader-text .dots i {
+    font-style: normal;
+    animation: dotBlink 1.2s infinite;
+  }
+  .putt-loader-text .dots i:nth-child(2) { animation-delay: 0.2s; }
+  .putt-loader-text .dots i:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dotBlink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+
   [hidden] { display: none !important; }
 </style>
 </head>
 <body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- procedural turf: fine turbulence bump-mapped with a distant light
+           (aimed by the weather script to match --sun-x/--sun-y) so the
+           noise reads as individually lit blades of grass rather than flat
+           static. See .turf-blades / body::before above. -->
+      <filter id="turfBlades" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9 0.75" numOctaves="2" seed="7" stitchTiles="stitch" result="blades"/>
+        <feDiffuseLighting in="blades" surfaceScale="2.4" diffuseConstant="1.25" lighting-color="#eafbe0" result="lit">
+          <feDistantLight id="turfSunLight" azimuth="235" elevation="48"/>
+        </feDiffuseLighting>
+        <feComponentTransfer in="lit">
+          <feFuncR type="linear" slope="1.15" intercept="-0.08"/>
+          <feFuncG type="linear" slope="1.15" intercept="-0.08"/>
+          <feFuncB type="linear" slope="1.15" intercept="-0.08"/>
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  </svg>
+  <div class="turf-blades" aria-hidden="true"></div>
   <div class="celestial" id="celestial" aria-hidden="true"></div>
   <div class="star-field" id="starField" aria-hidden="true"></div>
   <div class="weather-fx" id="weatherFx" hidden></div>
   <canvas id="confettiCanvas" aria-hidden="true" hidden></canvas>
+
+  <!-- putting-green loading screen shown between wizard steps: a golfer
+       strokes a putt and the ball's roll toward the cup doubles as the
+       progress bar (see showPuttLoader() / .putt-track-fill below) -->
+  <div class="putt-loader" id="puttLoader" aria-hidden="true" hidden>
+    <div class="putt-stage">
+      <div class="putt-ground"></div>
+      <div class="putt-golfer">
+        <div class="golfer-leg back"></div>
+        <div class="golfer-leg front"></div>
+        <div class="golfer-torso"></div>
+        <div class="golfer-head"></div>
+        <div class="golfer-cap"></div>
+        <div class="golfer-arm">
+          <div class="golfer-club"></div>
+        </div>
+      </div>
+      <div class="putt-track">
+        <div class="putt-track-fill"></div>
+        <div class="putt-ball"></div>
+        <div class="putt-flag">
+          <span class="flag-pole"></span>
+          <span class="flag-cloth"></span>
+          <span class="flag-cup"></span>
+        </div>
+      </div>
+      <p class="putt-loader-text">다음 홀 준비 중<span class="dots"><i>.</i><i>.</i><i>.</i></span></p>
+    </div>
+  </div>
 
   <div class="sky-widget" id="skyWidget" aria-hidden="true">
     <span class="sky-icon" id="skyIcon">🕒</span>
@@ -1131,6 +1509,14 @@
         <div class="count-label">명</div>
       </div>
       <button id="incBtn" class="count-btn" type="button" aria-label="인원 증가">+</button>
+    </div>
+
+    <div class="hole-count-control">
+      <div class="hole-count-label">라운드 홀 수</div>
+      <div class="hole-toggle" id="holeToggle" role="radiogroup" aria-label="라운드 홀 수 선택">
+        <button type="button" class="hole-toggle-btn" data-holes="9">9홀</button>
+        <button type="button" class="hole-toggle-btn active" data-holes="18">18홀</button>
+      </div>
     </div>
 
     <div class="name-list" id="nameList"></div>
@@ -1392,6 +1778,8 @@
     var MIN_PLAYERS = 2;
     var MAX_PLAYERS = 8;
     var HOLE_COUNT = 18;
+    var holeToggle = document.getElementById('holeToggle');
+    var holeToggleBtns = holeToggle.querySelectorAll('.hole-toggle-btn');
     var playerCount = 4;
     var names = [];
     var selectedMode = null;
@@ -1439,9 +1827,34 @@
       return Math.round(n).toLocaleString('ko-KR') + '원';
     }
 
+    // putting-green loading screen shown between wizard steps — see the
+    // markup/CSS for #puttLoader. Uses the [hidden] attribute (not just
+    // opacity) to fully remove it from the render tree between uses, so
+    // its child animations (the swing, the ball's roll, the fill bar)
+    // reliably restart from scratch every time it's shown.
+    var puttLoader = document.getElementById('puttLoader');
+    var PUTT_LOADER_HOLD_MS = 1750;
+    var PUTT_LOADER_FADE_MS = 260;
+
+    function showPuttLoader(onDone) {
+      puttLoader.hidden = false;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          puttLoader.classList.add('active');
+        });
+      });
+      setTimeout(function () {
+        puttLoader.classList.remove('active');
+        setTimeout(function () {
+          puttLoader.hidden = true;
+          onDone();
+        }, PUTT_LOADER_FADE_MS);
+      }, PUTT_LOADER_HOLD_MS);
+    }
+
     function transitionTo(fromEl, toEl, cb) {
       fromEl.classList.add('fade-out');
-      setTimeout(function () {
+      showPuttLoader(function () {
         fromEl.hidden = true;
         fromEl.classList.remove('fade-out');
         toEl.hidden = false;
@@ -1449,7 +1862,7 @@
         requestAnimationFrame(function () {
           toEl.classList.add('fade-in');
         });
-      }, 380);
+      });
     }
 
     function goBack(fromEl, toEl) {
@@ -2201,12 +2614,16 @@
       scores = [];
       currentHole = 0;
       betAmount = 1000;
+      HOLE_COUNT = 18;
+      holeToggleBtns.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-holes') === '18'); });
 
       var cards = modeList.querySelectorAll('.mode-card');
       cards.forEach(function (c) { c.classList.remove('selected'); });
 
       ball.classList.remove('hit');
       startBtn.disabled = false;
+      puttLoader.hidden = true;
+      puttLoader.classList.remove('active');
 
       clearTimeout(confettiStopTimer);
       confettiRunning = false;
@@ -2221,6 +2638,13 @@
       screenStart.classList.remove('fade-out');
     }
 
+    holeToggleBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        HOLE_COUNT = Number(btn.getAttribute('data-holes'));
+        holeToggleBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
+      });
+    });
+
     decBtn.addEventListener('click', function () {
       if (playerCount > MIN_PLAYERS) {
         playerCount--;
@@ -2234,10 +2658,40 @@
       }
     });
 
+    // small motion-blur afterimage sampled at the ball's live (animated)
+    // position, plus a turf-dust puff right at the point of impact —
+    // together these sell "a real ball actually flying" far better than
+    // the bare CSS transform alone.
+    function spawnBallGhost() {
+      var rect = ball.getBoundingClientRect();
+      if (rect.width < 2) return;
+      var ghost = document.createElement('div');
+      ghost.className = 'ball-ghost';
+      ghost.style.left = rect.left + 'px';
+      ghost.style.top = rect.top + 'px';
+      ghost.style.width = rect.width + 'px';
+      ghost.style.height = rect.height + 'px';
+      document.body.appendChild(ghost);
+      setTimeout(function () { ghost.remove(); }, 430);
+    }
+
+    function spawnDivotPuff() {
+      var rect = ball.getBoundingClientRect();
+      var puff = document.createElement('div');
+      puff.className = 'divot-puff';
+      puff.style.left = (rect.left + rect.width / 2) + 'px';
+      puff.style.top = (rect.top + rect.height) + 'px';
+      document.body.appendChild(puff);
+      setTimeout(function () { puff.remove(); }, 520);
+    }
+
     startBtn.addEventListener('click', function () {
       startBtn.disabled = true;
       try { playSwingSound(); } catch (e) { /* audio not available, continue silently */ }
       ball.classList.add('hit');
+      spawnDivotPuff();
+      var ghostTimer = setInterval(spawnBallGhost, 45);
+      setTimeout(function () { clearInterval(ghostTimer); }, 950);
 
       setTimeout(function () {
         screenStart.classList.add('fade-out');
@@ -2249,7 +2703,7 @@
             screenSetup.classList.add('fade-in');
           });
         }, 380);
-      }, 550);
+      }, 680);
     });
 
     backBtn.addEventListener('click', function () {
@@ -2269,16 +2723,7 @@
         return;
       }
       try { playHoleSound(); } catch (e) { /* audio not available, continue silently */ }
-
-      screenSetup.classList.add('fade-out');
-      setTimeout(function () {
-        screenSetup.hidden = true;
-        screenSetup.classList.remove('fade-out');
-        screenMode.hidden = false;
-        requestAnimationFrame(function () {
-          screenMode.classList.add('fade-in');
-        });
-      }, 380);
+      transitionTo(screenSetup, screenMode);
     });
 
     modeList.addEventListener('click', function (e) {
