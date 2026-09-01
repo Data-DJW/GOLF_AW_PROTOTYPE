@@ -1240,9 +1240,38 @@
     height: 42px;
     border-radius: 5px;
     background: #17130f;
+    transform-origin: top center;
   }
   .golfer-leg.back { left: 16px; transform: rotate(-8deg); }
-  .golfer-leg.front { left: 30px; transform: rotate(9deg); }
+  .golfer-leg.front {
+    left: 30px;
+    transform: rotate(9deg);
+    animation: legFlex 0.9s cubic-bezier(.4, 0, .2, 1) 1;
+  }
+  @keyframes legFlex {
+    0%, 44% { transform: rotate(9deg) scaleY(1); }
+    62% { transform: rotate(9deg) scaleY(0.92); }
+    80%, 100% { transform: rotate(9deg) scaleY(1); }
+  }
+
+  /* everything from the hips up sways together as one body — a small
+     rotation layered UNDER the arm's own much larger swing, so the
+     stroke reads as a whole person shifting weight through the ball
+     rather than just an arm pivoting on its own. */
+  .golfer-body {
+    position: absolute;
+    inset: 0;
+    transform-origin: bottom center;
+    animation: bodySway 0.9s cubic-bezier(.4, 0, .2, 1) 1;
+  }
+  @keyframes bodySway {
+    0% { transform: rotate(0deg); }
+    27% { transform: rotate(-1deg); }
+    58% { transform: rotate(-4deg); }
+    72% { transform: rotate(2.5deg); }
+    100% { transform: rotate(1.5deg); }
+  }
+
   .golfer-torso {
     position: absolute;
     bottom: 36px;
@@ -1320,8 +1349,11 @@
   }
   @keyframes puttSwing {
     0% { transform: rotate(16deg); }
-    32% { transform: rotate(-20deg); }
-    55% { transform: rotate(8deg); }
+    9% { transform: rotate(20deg); }
+    18% { transform: rotate(12deg); }
+    27% { transform: rotate(17deg); }
+    58% { transform: rotate(-20deg); }
+    72% { transform: rotate(8deg); }
     100% { transform: rotate(8deg); }
   }
 
@@ -1341,7 +1373,7 @@
     border-radius: 999px;
     background: linear-gradient(90deg, var(--gold-2), var(--gold-1));
     box-shadow: 0 0 10px rgba(217, 182, 74, 0.5);
-    animation: puttFillGrow 1.05s cubic-bezier(.3, .7, .4, 1) 0.48s forwards;
+    animation: puttFillGrow 1s cubic-bezier(.3, .7, .4, 1) 0.64s forwards;
   }
   .putt-ball {
     position: absolute;
@@ -1353,7 +1385,7 @@
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, #ffffff, #d9d9d9);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    animation: puttBallRoll 1.05s cubic-bezier(.3, .7, .4, 1) 0.48s forwards;
+    animation: puttBallRoll 1s cubic-bezier(.3, .7, .4, 1) 0.64s forwards;
   }
   @keyframes puttFillGrow {
     from { width: 0%; }
@@ -1460,11 +1492,13 @@
       <div class="putt-golfer">
         <div class="golfer-leg back"></div>
         <div class="golfer-leg front"></div>
-        <div class="golfer-torso"></div>
-        <div class="golfer-head"></div>
-        <div class="golfer-cap"></div>
-        <div class="golfer-arm">
-          <div class="golfer-club"></div>
+        <div class="golfer-body">
+          <div class="golfer-torso"></div>
+          <div class="golfer-head"></div>
+          <div class="golfer-cap"></div>
+          <div class="golfer-arm">
+            <div class="golfer-club"></div>
+          </div>
         </div>
       </div>
       <div class="putt-track">
@@ -1538,14 +1572,14 @@
           <span class="mode-radio" aria-hidden="true"></span>
           <div class="mode-head-text">
             <div class="mode-title">스트로크 (타수) 내기</div>
-            <div class="mode-tagline">18홀 타수를 그대로 합산해서 정산</div>
+            <div class="mode-tagline"><span class="hc-label">18</span>홀 타수를 그대로 합산해서 정산</div>
           </div>
         </div>
         <details class="mode-details">
           <summary>자세히 보기</summary>
           <div class="detail-block">
             <h4>기본 원리</h4>
-            <p>18홀 동안 각자 친 타수를 그대로 합산해서, 라운드가 끝난 후 타수 차이만큼 정산하는 방식입니다.</p>
+            <p><span class="hc-label">18</span>홀 동안 각자 친 타수를 그대로 합산해서, 라운드가 끝난 후 타수 차이만큼 정산하는 방식입니다.</p>
           </div>
           <div class="detail-block">
             <h4>정산 예시</h4>
@@ -1580,7 +1614,7 @@
           <summary>자세히 보기</summary>
           <div class="detail-block">
             <h4>기본 원리</h4>
-            <p>18개 홀 하나하나가 독립된 승부입니다. 그 홀에서 가장 낮은 타수를 친 사람이 그 홀의 상금(스킨)을 독식합니다.</p>
+            <p><span class="hc-label">18</span>개 홀 하나하나가 독립된 승부입니다. 그 홀에서 가장 낮은 타수를 친 사람이 그 홀의 상금(스킨)을 독식합니다.</p>
           </div>
           <div class="detail-block">
             <h4>핵심 규칙 — 캐리오버(이월)</h4>
@@ -1642,7 +1676,7 @@
           <tr><th>방식</th><th>승부 단위</th><th>특징</th></tr>
         </thead>
         <tbody>
-          <tr><td>스트로크</td><td>18홀 전체</td><td>단순, 누적형</td></tr>
+          <tr><td>스트로크</td><td><span class="hc-label">18</span>홀 전체</td><td>단순, 누적형</td></tr>
           <tr><td>스킨스</td><td>홀 단위</td><td>긴장감 최고, 역전 가능</td></tr>
           <tr><td>뽑기</td><td>팀(홀/구간 단위)</td><td>운 요소 큼, 재미 위주</td></tr>
         </tbody>
@@ -1833,7 +1867,7 @@
     // its child animations (the swing, the ball's roll, the fill bar)
     // reliably restart from scratch every time it's shown.
     var puttLoader = document.getElementById('puttLoader');
-    var PUTT_LOADER_HOLD_MS = 1750;
+    var PUTT_LOADER_HOLD_MS = 1900;
     var PUTT_LOADER_FADE_MS = 260;
 
     function showPuttLoader(onDone) {
@@ -1852,7 +1886,14 @@
       }, PUTT_LOADER_HOLD_MS);
     }
 
+    // guards against a fast double-tap on "다음" re-entering transitionTo
+    // while the putt loader is already mid-flight, which used to be able to
+    // start two overlapping loader/screen-swap sequences at once.
+    var isTransitioning = false;
+
     function transitionTo(fromEl, toEl, cb) {
+      if (isTransitioning) return;
+      isTransitioning = true;
       fromEl.classList.add('fade-out');
       showPuttLoader(function () {
         fromEl.hidden = true;
@@ -1862,6 +1903,7 @@
         requestAnimationFrame(function () {
           toEl.classList.add('fade-in');
         });
+        isTransitioning = false;
       });
     }
 
@@ -2624,6 +2666,7 @@
       startBtn.disabled = false;
       puttLoader.hidden = true;
       puttLoader.classList.remove('active');
+      isTransitioning = false;
 
       clearTimeout(confettiStopTimer);
       confettiRunning = false;
@@ -2644,6 +2687,14 @@
         holeToggleBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
       });
     });
+
+    // the mode-selection screen's explanatory copy ("18홀 타수를 그대로
+    // 합산...") was previously hardcoded to 18 even after adding the 9/18
+    // toggle — keep it honest by filling in whatever was actually chosen.
+    var holeCountLabels = document.querySelectorAll('.hc-label');
+    function syncHoleCountLabels() {
+      holeCountLabels.forEach(function (el) { el.textContent = HOLE_COUNT; });
+    }
 
     decBtn.addEventListener('click', function () {
       if (playerCount > MIN_PLAYERS) {
@@ -2723,7 +2774,7 @@
         return;
       }
       try { playHoleSound(); } catch (e) { /* audio not available, continue silently */ }
-      transitionTo(screenSetup, screenMode);
+      transitionTo(screenSetup, screenMode, syncHoleCountLabels);
     });
 
     modeList.addEventListener('click', function (e) {
