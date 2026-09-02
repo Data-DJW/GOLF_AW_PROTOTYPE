@@ -935,6 +935,68 @@
     background: var(--gold-1);
   }
 
+  /* --- live settlement: recomputed from whatever holes are filled so
+     far, right on the scoring screen, so nobody has to wait for the
+     result screen to see roughly where they stand --- */
+  .live-settlement {
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(217, 182, 74, 0.07);
+    border: 1px solid var(--glass-border-gold);
+  }
+  .live-settlement-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 0.55rem;
+  }
+  .live-settlement-label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-1);
+  }
+  .live-settlement-note {
+    font-size: 0.72rem;
+    color: var(--cream-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .live-settlement-row {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .live-settlement-chip {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .live-settlement-chip .lsc-name {
+    font-weight: 600;
+    color: var(--cream-dim);
+  }
+  .live-settlement-chip .lsc-amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .live-settlement-chip .lsc-amount.positive { color: var(--gold-1); }
+  .live-settlement-chip .lsc-amount.negative { color: var(--ruby); }
+  .live-settlement-chip .lsc-amount.even { color: rgba(246, 241, 228, 0.5); }
+
   .score-players {
     text-align: left;
     max-height: 46vh;
@@ -1000,6 +1062,122 @@
   #screen-bet .subtitle {
     margin-top: 0.4rem;
     margin-bottom: 1.7rem;
+  }
+
+  /* --- stroke-mode extras: handicap + birdie-double toggle --- */
+  .stroke-options {
+    margin-bottom: 1.7rem;
+    padding: 0.9rem 1rem 1.1rem;
+    border-radius: 16px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    text-align: left;
+  }
+  .stroke-options .hole-count-label {
+    margin-bottom: 0.7rem;
+    text-align: center;
+  }
+  .handicap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .handicap-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .handicap-name {
+    flex: 1;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--cream-dim);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .handicap-input {
+    width: 64px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    outline: none;
+    text-align: center;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
+  }
+  .handicap-input:focus {
+    border-color: var(--gold-2);
+    box-shadow: 0 0 0 3px rgba(217, 182, 74, 0.25);
+  }
+  .handicap-unit {
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    color: var(--cream-dim);
+  }
+
+  .double-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--glass-border);
+    cursor: pointer;
+  }
+  .double-toggle-text { flex: 1; }
+  .double-toggle-title {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--cream);
+  }
+  .double-toggle-desc {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--cream-dim);
+  }
+  .double-toggle-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .double-toggle-switch {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 25px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--glass-border);
+    position: relative;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .double-toggle-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: var(--cream);
+    transition: transform 0.2s cubic-bezier(.2,.9,.3,1);
+  }
+  .double-toggle-checkbox:checked + .double-toggle-switch {
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    border-color: transparent;
+  }
+  .double-toggle-checkbox:checked + .double-toggle-switch::after {
+    transform: translateX(17px);
+  }
+  .double-toggle-checkbox:focus-visible + .double-toggle-switch {
+    box-shadow: 0 0 0 3px rgba(217, 182, 74, 0.35);
   }
 
   .bet-chip-row {
@@ -1694,6 +1872,20 @@
     <h2>베팅 금액</h2>
     <p class="subtitle" id="betLabel">금액을 정하세요</p>
 
+    <div class="stroke-options" id="strokeOptions" hidden>
+      <div class="hole-count-label">핸디캡 (선택, 0~36타)</div>
+      <div class="handicap-list" id="handicapList"></div>
+
+      <label class="double-toggle-row" for="doubleOnBirdieToggle">
+        <span class="double-toggle-text">
+          <span class="double-toggle-title">버디 더블 (배판)</span>
+          <span class="double-toggle-desc">누군가 버디 이상을 하면 다음 홀부터 판돈이 2배로 커집니다</span>
+        </span>
+        <input type="checkbox" id="doubleOnBirdieToggle" class="double-toggle-checkbox">
+        <span class="double-toggle-switch" aria-hidden="true"></span>
+      </label>
+    </div>
+
     <div class="bet-chip-row" id="betChipRow"></div>
     <div class="bet-custom-row">
       <input id="betCustomInput" type="number" inputmode="numeric" min="0" step="100" class="bet-custom-input" placeholder="직접 입력">
@@ -1732,6 +1924,14 @@
       <button id="holePrevBtn" class="hole-nav-btn" type="button" aria-label="이전 홀">‹</button>
       <div class="hole-chip-row" id="holeChipRow"></div>
       <button id="holeNextChevron" class="hole-nav-btn" type="button" aria-label="다음 홀 보기">›</button>
+    </div>
+
+    <div class="live-settlement" id="liveSettlement">
+      <div class="live-settlement-head">
+        <span class="live-settlement-label">실시간 정산</span>
+        <span class="live-settlement-note" id="liveSettlementNote"></span>
+      </div>
+      <div class="live-settlement-row" id="liveSettlementRow"></div>
     </div>
 
     <div class="score-players" id="scorePlayers"></div>
@@ -1784,6 +1984,9 @@
     var betCurrentDisplay = document.getElementById('betCurrentDisplay');
     var betBackBtn = document.getElementById('betBackBtn');
     var betNextBtn = document.getElementById('betNextBtn');
+    var strokeOptions = document.getElementById('strokeOptions');
+    var handicapList = document.getElementById('handicapList');
+    var doubleOnBirdieToggle = document.getElementById('doubleOnBirdieToggle');
     var screenDraw = document.getElementById('screen-draw');
     var cardGrid = document.getElementById('cardGrid');
     var drawResult = document.getElementById('drawResult');
@@ -1797,6 +2000,8 @@
     var holePrevBtn = document.getElementById('holePrevBtn');
     var holeNextChevron = document.getElementById('holeNextChevron');
     var scorePlayers = document.getElementById('scorePlayers');
+    var liveSettlementNote = document.getElementById('liveSettlementNote');
+    var liveSettlementRow = document.getElementById('liveSettlementRow');
     var scoreBackBtn = document.getElementById('scoreBackBtn');
     var scoreNextBtn = document.getElementById('scoreNextBtn');
     var screenResult = document.getElementById('screen-result');
@@ -1853,6 +2058,8 @@
       draw: '원 / 홀'
     };
     var betAmount = 1000;
+    var handicaps = [];        // stroke mode only: handicaps[playerIdx] -> strokes forgiven (0+)
+    var doubleOnBirdie = false; // stroke mode only: "버디 더블" — bet doubles from the hole after any birdie-or-better
     var audioCtx = null;
     var holeSound = new Audio('sounds/hole-in.wav');
     holeSound.preload = 'auto';
@@ -2070,6 +2277,60 @@
       }
     });
 
+    // ---- stroke-mode extras: handicap + "버디 더블" ----
+
+    function clampHandicap(v) {
+      v = Math.round(v);
+      if (isNaN(v) || v < 0) return 0;
+      if (v > 36) return 36;
+      return v;
+    }
+
+    function renderStrokeOptions() {
+      strokeOptions.hidden = (selectedMode !== 'stroke');
+      if (selectedMode !== 'stroke') return;
+
+      handicaps = handicaps.slice(0, playerCount);
+      handicapList.innerHTML = '';
+      for (var i = 0; i < playerCount; i++) {
+        (function (idx) {
+          var row = document.createElement('div');
+          row.className = 'handicap-row';
+
+          var name = document.createElement('span');
+          name.className = 'handicap-name';
+          name.textContent = names[idx] || (idx + 1) + '번';
+          row.appendChild(name);
+
+          var input = document.createElement('input');
+          input.type = 'number';
+          input.className = 'handicap-input';
+          input.min = '0';
+          input.max = '36';
+          input.step = '1';
+          input.placeholder = '0';
+          input.value = handicaps[idx] ? String(handicaps[idx]) : '';
+          input.addEventListener('input', function () {
+            handicaps[idx] = clampHandicap(parseInt(input.value, 10));
+          });
+          row.appendChild(input);
+
+          var unit = document.createElement('span');
+          unit.className = 'handicap-unit';
+          unit.textContent = '타';
+          row.appendChild(unit);
+
+          handicapList.appendChild(row);
+        })(i);
+      }
+
+      doubleOnBirdieToggle.checked = doubleOnBirdie;
+    }
+
+    doubleOnBirdieToggle.addEventListener('change', function () {
+      doubleOnBirdie = doubleOnBirdieToggle.checked;
+    });
+
     // ---- team draw (뽑기) ----
 
     function shuffle(arr) {
@@ -2257,6 +2518,15 @@
             head.appendChild(badge);
           }
 
+          if (selectedMode === 'stroke' && handicaps[pIdx]) {
+            var hcBadge = document.createElement('span');
+            hcBadge.className = 'score-team-badge';
+            hcBadge.style.fontSize = '0.7rem';
+            hcBadge.style.color = 'var(--gold-1)';
+            hcBadge.textContent = 'HC' + handicaps[pIdx];
+            head.appendChild(hcBadge);
+          }
+
           var nameSpan = document.createElement('span');
           nameSpan.className = 'score-player-name';
           nameSpan.textContent = names[pIdx] || (pIdx + 1) + '번';
@@ -2288,6 +2558,46 @@
           scorePlayers.appendChild(row);
         })(p);
       }
+
+      renderLiveSettlement();
+    }
+
+    // recomputed on every score tap — see computeCurrentSettlement()'s
+    // note on why it's safe to call before the round is finished.
+    function renderLiveSettlement() {
+      var settlement = computeCurrentSettlement();
+      var filledCount = 0;
+      for (var h = 0; h < HOLE_COUNT; h++) { if (isHoleFilled(h)) filledCount++; }
+
+      var noteParts = [filledCount + ' / ' + HOLE_COUNT + '홀 반영'];
+      if (selectedMode === 'stroke' && doubleOnBirdie && settlement.finalMultiplier > 1) {
+        noteParts.push('현재 배수 ×' + settlement.finalMultiplier);
+      }
+      if (selectedMode === 'skins' && settlement.unresolvedCarry) {
+        noteParts.push('이월 ' + settlement.unresolvedCarry + '회');
+      }
+      liveSettlementNote.textContent = noteParts.join(' · ');
+
+      liveSettlementRow.innerHTML = '';
+      for (var p = 0; p < playerCount; p++) {
+        var net = Math.round(settlement.net[p]);
+        var cls = net > 0 ? 'positive' : (net < 0 ? 'negative' : 'even');
+
+        var chip = document.createElement('span');
+        chip.className = 'live-settlement-chip';
+
+        var nameEl = document.createElement('span');
+        nameEl.className = 'lsc-name';
+        nameEl.textContent = names[p] || (p + 1) + '번';
+        chip.appendChild(nameEl);
+
+        var amtEl = document.createElement('span');
+        amtEl.className = 'lsc-amount ' + cls;
+        amtEl.textContent = (net > 0 ? '+' : '') + formatWon(net);
+        chip.appendChild(amtEl);
+
+        liveSettlementRow.appendChild(chip);
+      }
     }
 
     function enterScoreScreen() {
@@ -2310,23 +2620,66 @@
 
     // ---- 정산 (settlement) ----
 
+    // Settles hole-by-hole (rather than off one lump total) so "버디 더블"
+    // can escalate the per-stroke price mid-round: whenever anyone cards a
+    // birdie-or-better, the price doubles starting the NEXT hole. Handicap
+    // is applied once at the end as a flat, never-doubled correction — it's
+    // folded in as one extra "virtual hole" where each player's score is
+    // -handicap, which is mathematically equivalent to subtracting the
+    // handicap from their final total before comparing (see the mode's own
+    // "핸디캡 적용" description) without needing a second, separate pass.
     function computeStrokeSettlement() {
-      var totals = playerTotals();
       var net = [];
-      for (var z = 0; z < playerCount; z++) net.push(0);
-      var transactions = [];
-      for (var i = 0; i < playerCount; i++) {
-        for (var j = 0; j < playerCount; j++) {
-          if (i === j) continue;
-          if (totals[j] > totals[i]) {
-            var amt = (totals[j] - totals[i]) * betAmount;
-            net[i] += amt;
-            net[j] -= amt;
-            transactions.push({ from: j, to: i, amount: amt });
+      var pairAmt = [];
+      for (var z = 0; z < playerCount; z++) {
+        net.push(0);
+        pairAmt.push(new Array(playerCount).fill(0));
+      }
+
+      function accumulateRow(row, mult) {
+        for (var i = 0; i < playerCount; i++) {
+          for (var j = 0; j < playerCount; j++) {
+            if (i === j) continue;
+            if (row[j] > row[i]) {
+              var amt = (row[j] - row[i]) * betAmount * mult;
+              net[i] += amt;
+              net[j] -= amt;
+              pairAmt[i][j] += amt;
+            }
           }
         }
       }
-      return { net: net, transactions: transactions };
+
+      var multiplier = 1;
+      for (var h = 0; h < HOLE_COUNT; h++) {
+        if (!isHoleFilled(h)) continue;
+        var row = scores[h];
+        accumulateRow(row, multiplier);
+        if (doubleOnBirdie) {
+          var anyBirdie = false;
+          for (var p = 0; p < playerCount; p++) {
+            if (row[p] <= -1) { anyBirdie = true; break; }
+          }
+          if (anyBirdie) multiplier *= 2;
+        }
+      }
+
+      var hasHandicap = handicaps.some(function (hc) { return hc; });
+      if (hasHandicap) {
+        var virtualRow = [];
+        for (var p2 = 0; p2 < playerCount; p2++) virtualRow.push(-(handicaps[p2] || 0));
+        accumulateRow(virtualRow, 1);
+      }
+
+      var transactions = [];
+      for (var a = 0; a < playerCount; a++) {
+        for (var b = 0; b < playerCount; b++) {
+          if (a === b) continue;
+          if (pairAmt[a][b] > 0) transactions.push({ from: b, to: a, amount: pairAmt[a][b] });
+        }
+      }
+
+      return { net: net, transactions: transactions, finalMultiplier: multiplier, hasHandicap: hasHandicap };
     }
 
     function computeSkinsSettlement() {
@@ -2399,6 +2752,12 @@
     function renderResultDetail(settlement) {
       var html = '';
       if (selectedMode === 'stroke') {
+        if (settlement.hasHandicap) {
+          html += '<p><strong>핸디캡이 적용된 결과입니다.</strong> (참가자별 핸디캡만큼 타수를 보정)</p>';
+        }
+        if (doubleOnBirdie && settlement.finalMultiplier > 1) {
+          html += '<p><strong>버디 더블 적용:</strong> 라운드 중 버디 이상이 나와 최종 판돈이 ×' + settlement.finalMultiplier + '까지 커졌습니다.</p>';
+        }
         if (settlement.transactions.length === 0) {
           html = '<p>전원 동타라 정산 내역이 없습니다.</p>';
         } else {
@@ -2537,11 +2896,19 @@
       }
     });
 
+    // shared by the final result screen and the live in-progress panel on
+    // the scoring screen — every compute*Settlement() already tolerates
+    // holes that aren't fully filled in yet (skins/draw skip them via
+    // isHoleFilled; stroke now does too), so this is safe to call at any
+    // point mid-round, not just once every hole is done.
+    function computeCurrentSettlement() {
+      if (selectedMode === 'stroke') return computeStrokeSettlement();
+      if (selectedMode === 'skins') return computeSkinsSettlement();
+      return computeDrawSettlement();
+    }
+
     function renderResultScreen() {
-      var settlement;
-      if (selectedMode === 'stroke') settlement = computeStrokeSettlement();
-      else if (selectedMode === 'skins') settlement = computeSkinsSettlement();
-      else settlement = computeDrawSettlement();
+      var settlement = computeCurrentSettlement();
 
       resultSubtitle.textContent = MODE_LABELS[selectedMode] + ' · ' + formatWon(betAmount) + ' ' + BET_UNITS[selectedMode].replace('원 ', '');
 
@@ -2656,6 +3023,10 @@
       scores = [];
       currentHole = 0;
       betAmount = 1000;
+      handicaps = [];
+      doubleOnBirdie = false;
+      doubleOnBirdieToggle.checked = false;
+      strokeOptions.hidden = true;
       HOLE_COUNT = 18;
       holeToggleBtns.forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-holes') === '18'); });
 
@@ -2799,7 +3170,10 @@
         alert('내기 방식을 선택해주세요.');
         return;
       }
-      transitionTo(screenMode, screenBet, renderBetChips);
+      transitionTo(screenMode, screenBet, function () {
+        renderBetChips();
+        renderStrokeOptions();
+      });
     });
 
     betBackBtn.addEventListener('click', function () {
