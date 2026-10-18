@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio</title>
+  <meta name="description" content="Personal portfolio" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --accent: #2f6fed;
+      --border: #e6e6e6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111214;
+        --text: #f1f1f1;
+        --muted: #a0a0a0;
+        --accent: #6c9bff;
+        --border: #2a2b2e;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      line-height: 1.6;
+    }
+    header, main, footer { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 0; }
+    nav a { color: var(--muted); text-decoration: none; margin-left: 16px; }
+    nav a:hover { color: var(--accent); }
+    .logo { font-weight: 700; color: var(--text); margin-left: 0; }
+    section { padding: 64px 0; border-top: 1px solid var(--border); }
+    #hero { border-top: none; padding-top: 96px; }
+    h1 { font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1.2; margin: 0 0 16px; }
+    h2 { font-size: 1.5rem; margin: 0 0 24px; }
+    .muted { color: var(--muted); }
+    footer { padding: 32px 16px; color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="logo" href="#hero">Your Name</a>
+      <div>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="hero">
+      <h1>안녕하세요,<br />저는 <span style="color: var(--accent)">Your Name</span>입니다.</h1>
+      <p class="muted">한 줄 소개를 여기에 적어주세요.</p>
+    </section>
+
+    <section id="about">
+      <h2>About</h2>
+      <p class="muted">자기소개 내용이 들어갈 자리입니다.</p>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <p class="muted">프로젝트 목록이 들어갈 자리입니다.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p class="muted">연락처 정보가 들어갈 자리입니다.</p>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> Your Name</footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
